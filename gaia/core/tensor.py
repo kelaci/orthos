@@ -3,14 +3,30 @@ Tensor operations and utilities.
 
 This module provides fundamental tensor operations used throughout GAIA,
 including weight initialization, activation functions, and normalization.
+
+Supports both NumPy (CPU) and CuPy (GPU) backends automatically.
 """
 
-import numpy as np
-from typing import Tuple, Optional, Union
+from typing import Tuple, Optional, Union, Any
 
-def initialize_weights(shape: Tuple[int, ...], init_type: str = 'he') -> np.ndarray:
+# Import GPU utilities first
+try:
+    from .gpu_utils import get_array_module, get_device, to_cpu, to_gpu
+    from .gpu_utils import CUPY_AVAILABLE
+    USING_GPU = get_device() == 'cuda'
+except ImportError:
+    import numpy as np
+    get_array_module = lambda: np
+    get_device = lambda: 'cpu'
+    to_cpu = lambda x: x
+    to_gpu = lambda x: x
+    CUPY_AVAILABLE = False
+    USING_GPU = False
+
+
+def initialize_weights(shape: Tuple[int, ...], init_type: str = 'he') -> Any:
     """
-    Initialize weights with specified initialization.
+    Initialize weights with specified initialization on current device.
 
     Args:
         shape: Shape of the weight matrix
@@ -18,24 +34,23 @@ def initialize_weights(shape: Tuple[int, ...], init_type: str = 'he') -> np.ndar
 
     Returns:
         Initialized weight matrix
-
-    Raises:
-        ValueError: If unknown initialization type is specified
     """
+    xp = get_array_module()
+    
     if init_type == 'he':
-        return np.random.randn(*shape) * np.sqrt(2.0 / shape[0])
+        return xp.random.randn(*shape) * xp.sqrt(2.0 / shape[0])
     elif init_type == 'xavier':
-        return np.random.randn(*shape) * np.sqrt(1.0 / shape[0])
+        return xp.random.randn(*shape) * xp.sqrt(1.0 / shape[0])
     elif init_type == 'normal':
-        return np.random.randn(*shape) * 0.01
+        return xp.random.randn(*shape) * 0.01
     elif init_type == 'uniform':
-        return np.random.uniform(-0.01, 0.01, shape)
+        return xp.random.uniform(-0.01, 0.01, shape)
     else:
         raise ValueError(f"Unknown initialization type: {init_type}")
 
-def apply_activation(x: np.ndarray, activation: str) -> np.ndarray:
+def apply_activation(x: Any, activation: str) -> Any:
     """
-    Apply activation function.
+    Apply activation function on current device.
 
     Args:
         x: Input tensor
@@ -43,45 +58,46 @@ def apply_activation(x: np.ndarray, activation: str) -> np.ndarray:
 
     Returns:
         Activated tensor
-
-    Raises:
-        ValueError: If unknown activation function is specified
     """
+    xp = get_array_module()
+    
     if activation == 'relu':
-        return np.maximum(0, x)
+        return xp.maximum(0, x)
     elif activation == 'sigmoid':
-        return 1 / (1 + np.exp(-x))
+        return 1 / (1 + xp.exp(-x))
     elif activation == 'tanh':
-        return np.tanh(x)
+        return xp.tanh(x)
     elif activation == 'linear':
         return x
     else:
         raise ValueError(f"Unknown activation: {activation}")
 
-def apply_activation_derivative(x: np.ndarray, activation: str) -> np.ndarray:
+def apply_activation_derivative(x: Any, activation: str) -> Any:
     """
     Apply activation function derivative.
 
     Args:
-        x: Input tensor (pre-activation or post-activation depending on function)
+        x: Input tensor
         activation: Activation function name
 
     Returns:
         Derivative tensor
     """
+    xp = get_array_module()
+    
     if activation == 'relu':
         return (x > 0).astype(float)
     elif activation == 'sigmoid':
-        s = 1 / (1 + np.exp(-x))
+        s = 1 / (1 + xp.exp(-x))
         return s * (1 - s)
     elif activation == 'tanh':
-        return 1.0 - np.tanh(x)**2
+        return 1.0 - xp.tanh(x)**2
     elif activation == 'linear':
-        return np.ones_like(x)
+        return xp.ones_like(x)
     else:
         raise ValueError(f"Unknown activation: {activation}")
 
-def normalize_tensor(x: np.ndarray, axis: Optional[int] = None, eps: float = 1e-8) -> np.ndarray:
+def normalize_tensor(x: Any, axis: Optional[int] = None, eps: float = 1e-8) -> Any:
     """
     Normalize tensor along specified axis.
 
@@ -93,45 +109,45 @@ def normalize_tensor(x: np.ndarray, axis: Optional[int] = None, eps: float = 1e-
     Returns:
         Normalized tensor
     """
-    norm = np.linalg.norm(x, axis=axis, keepdims=True)
+    xp = get_array_module()
+    norm = xp.linalg.norm(x, axis=axis, keepdims=True)
     return x / (norm + eps)
 
-def temporal_convolution(x: np.ndarray, kernel: np.ndarray, mode: str = 'same') -> np.ndarray:
+def temporal_convolution(x: Any, kernel: Any, mode: str = 'same') -> Any:
     """
     Apply temporal convolution.
 
     Args:
         x: Input tensor (time, features)
-        kernel: Convolution kernel (kernel_time,) or (kernel_time, features)
+        kernel: Convolution kernel
         mode: Convolution mode ('valid', 'same', 'full')
 
     Returns:
         Convolved tensor (time, features)
     """
+    from .gpu_utils import convolve
+    xp = get_array_module()
+    
     if len(x.shape) != 2:
         raise ValueError(f"Input x must be 2D (time, features), got {x.shape}")
 
     time_steps, features = x.shape
     
+    # Delegate to gpu_utils.convolve which handles dispatch
     if len(kernel.shape) == 1:
-        # 1D kernel applied to each feature independently
-        result = np.zeros_like(x)
+        result = xp.zeros_like(x)
         for f in range(features):
-            result[:, f] = np.convolve(x[:, f], kernel, mode=mode)
+            result[:, f] = convolve(x[:, f], kernel, mode=mode)
         return result
     elif len(kernel.shape) == 2:
-        # 2D kernel (kernel_time, features)
-        if kernel.shape[1] != features:
-            raise ValueError(f"Kernel features {kernel.shape[1]} must match input features {features}")
-        
-        result = np.zeros_like(x)
+        result = xp.zeros_like(x)
         for f in range(features):
-            result[:, f] = np.convolve(x[:, f], kernel[:, f], mode=mode)
+            result[:, f] = convolve(x[:, f], kernel[:, f], mode=mode)
         return result
     else:
         raise NotImplementedError("Multi-dimensional temporal convolution not yet implemented")
 
-def correlation_matrix(x: np.ndarray) -> np.ndarray:
+def correlation_matrix(x: Any) -> Any:
     """
     Compute correlation matrix of input tensor.
 
@@ -141,19 +157,5 @@ def correlation_matrix(x: np.ndarray) -> np.ndarray:
     Returns:
         Correlation matrix (features, features)
     """
-    if len(x.shape) != 2:
-        raise ValueError(f"Input x must be 2D (time, features), got {x.shape}")
-        
-    # Standardize inputs
-    x_mean = np.mean(x, axis=0)
-    x_std = np.std(x, axis=0) + 1e-8
-    x_standardized = (x - x_mean) / x_std
-    
-    # Compute correlation matrix: (X.T @ X) / (N - 1)
-    n = x.shape[0]
-    if n > 1:
-        corr = np.dot(x_standardized.T, x_standardized) / (n - 1)
-    else:
-        corr = np.eye(x.shape[1])
-        
-    return corr
+    from .gpu_utils import corrcoef
+    return corrcoef(x)

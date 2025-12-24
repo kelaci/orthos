@@ -2,21 +2,36 @@
 ReactiveLayer implementation.
 
 Fast, reactive processing layer with fixed weights for initial feature extraction.
+
+This layer supports GPU acceleration through CuPy when available.
 """
 
 import numpy as np
 from typing import Optional, Dict, Tuple, Any
 from gaia.core.base import Layer
 from gaia.core.types import Tensor, ActivationFunction
-from gaia.core.tensor import initialize_weights, apply_activation, apply_activation_derivative
+
+# Import GPU utilities (conditionally available)
+try:
+    from gaia.core.gpu_utils import (
+        get_array_module, get_device, zeros, dot, matmul,
+        CUPY_AVAILABLE
+    )
+    USING_GPU = get_device() == 'cuda'
+except ImportError:
+    import numpy as xp
+    zeros = lambda shape, **kwargs: np.zeros(shape, **kwargs)
+    dot = lambda a, b: np.dot(a, b)
+    matmul = lambda a, b: np.matmul(a, b)
+    CUPY_AVAILABLE = False
+    USING_GPU = False
 
 class ReactiveLayer(Layer):
     """
-    Fast, reactive processing layer with fixed weights.
+    Fast, reactive processing layer with fixed weights for initial feature extraction.
 
-    This layer provides rapid feedforward processing without plasticity,
-    suitable for initial feature extraction in hierarchical processing.
-
+    Supports GPU acceleration when CuPy is available.
+    
     Attributes:
         input_size: Size of input features
         output_size: Size of output features
@@ -43,15 +58,33 @@ class ReactiveLayer(Layer):
         self.biases = None
         self.activation_fn = activation
         self.init_type = init_type
-        self.last_input: Optional[Tensor] = None
-        self.last_pre_activation: Optional[Tensor] = None
 
         self._initialize_parameters()
 
     def _initialize_parameters(self) -> None:
-        """Initialize weights and biases."""
-        self.weights = initialize_weights((self.output_size, self.input_size), self.init_type)
-        self.biases = np.zeros(self.output_size)
+        """Initialize weights and biases using GPU if available."""
+        # Use GPU utilities if available, otherwise NumPy
+        self.weights = zeros((self.output_size, self.input_size))
+        self.biases = zeros((self.output_size,))
+
+        # Different initialization based on type
+        if self.init_type == 'he':
+            # He initialization: N(0, 1/sqrt(n))
+            self.weights = xp.random.randn(self.output_size, self.input_size)
+            self.weights *= xp.sqrt(2.0 / self.input_size)
+        elif self.init_type == 'xavier':
+            # Xavier initialization: N(0, 1/sqrt(fan_in))
+            self.weights = xp.random.randn(self.output_size, self.input_size)
+            self.weights *= xp.sqrt(1.0 / self.input_size)
+        elif self.init_type == 'normal':
+            # Normal initialization: N(0, 0.01)
+            self.weights = xp.random.randn(self.output_size, self.input_size) * 0.01
+        elif self.init_type == 'uniform':
+            # Uniform initialization: U(-0.01, 0.01)
+            self.weights = xp.random.uniform(-0.01, 0.01, 
+                                            (self.output_size, self.input_size))
+        else:
+            raise ValueError(f"Unknown init_type: {self.init_type}")
 
     def forward(self, x: Tensor) -> Tensor:
         """
@@ -66,88 +99,91 @@ class ReactiveLayer(Layer):
         Raises:
             ValueError: If input shape doesn't match expected dimensions
         """
+        # Use GPU-accelerated dot operation
         if x.shape[1] != self.input_size:
             raise ValueError(f"Input size mismatch: expected {self.input_size}, got {x.shape[1]}")
 
-        self.last_input = x
-        # Linear transformation
-        self.last_pre_activation = np.dot(x, self.weights.T) + self.biases
+        # Linear transformation: y = x @ W + b
+        output = dot(x, self.weights.T) + self.biases
 
         # Apply activation
-        return apply_activation(self.last_pre_activation, self.activation_fn)
+        if self.activation_fn == 'relu':
+            output = xp.maximum(0, output)
+        elif self.activation_fn == 'sigmoid':
+            output = 1.0 / (1.0 + xp.exp(-output))
+        elif self.activation_fn == 'tanh':
+            output = xp.tanh(output)
+        elif self.activation_fn == 'linear':
+            pass  # output is already linear
+        else:
+            raise ValueError(f"Unknown activation: {self.activation_fn}")
+
+        return output
 
     def backward(self, grad: Tensor) -> Tensor:
         """
         Backward pass for gradient computation.
 
         Args:
-            grad: Gradient from next layer (batch_size, output_size)
+            grad: Gradient tensor from next layer (batch_size, output_size)
 
         Returns:
-            Gradient for previous layer (batch_size, input_size)
-        """
-        if self.last_pre_activation is None:
-            raise ValueError("Forward pass must be called before backward pass")
+            Gradient tensor for previous layer (batch_size, input_size)
 
-        # Derivative of activation
-        da = apply_activation_derivative(self.last_pre_activation, self.activation_fn)
-        
-        # Combined gradient
-        delta = grad * da
-        
-        # Gradient with respect to input: delta @ weights
-        return np.dot(delta, self.weights)
+        Raises:
+            ValueError: If gradient shape doesn't match expected dimensions
+        """
+        if grad.shape[1] != self.output_size:
+            raise ValueError(f"Gradient size mismatch: expected {self.output_size}, got {grad.shape[1]}")
+
+        # Compute gradient with respect to input: grad @ W
+        # Using GPU-accelerated matmul
+        input_grad = matmul(grad, self.weights)
+
+        return input_grad
 
     def update(self, lr: float) -> None:
         """
         Update layer parameters.
 
-        ReactiveLayer has fixed weights - no update implemented.
-
+        Note: ReactiveLayer has fixed weights - no update implemented.
+        
         Args:
             lr: Learning rate (ignored for this layer type)
         """
-        # ReactiveLayer has fixed weights - no update
+        # ReactiveLayer has fixed weights - no update needed
         pass
 
     def reset_state(self) -> None:
-        """Reset internal state."""
+        """
+        Reset internal state.
+
+        ReactiveLayer has no internal state - this is a no-op.
+        """
         # No internal state to reset
         pass
-
-    def activation(self, x: Tensor) -> Tensor:
-        """
-        Apply activation function.
-
-        Args:
-            x: Input tensor
-
-        Returns:
-            Activated tensor
-        """
-        return apply_activation(x, self.activation_fn)
 
     def get_weights(self) -> Tensor:
         """
         Get current weights.
 
         Returns:
-            Weight matrix
+            Weight matrix (output_size, input_size)
         """
-        return self.weights.copy()
+        return self.weights
 
     def set_weights(self, weights: Tensor) -> None:
         """
         Set weights.
 
         Args:
-            weights: New weight matrix
+            weights: New weight matrix (output_size, input_size)
 
         Raises:
             ValueError: If weight shape doesn't match expected dimensions
         """
-        if weights.shape != self.weights.shape:
-            raise ValueError(f"Weight shape mismatch: expected {self.weights.shape}, got {weights.shape}")
+        if weights.shape != (self.output_size, self.input_size):
+            raise ValueError(f"Weight shape mismatch: expected {(self.output_size, self.input_size)}, got {weights.shape}")
         self.weights = weights.copy()
 
     def get_config(self) -> Dict[str, Any]:
@@ -161,9 +197,12 @@ class ReactiveLayer(Layer):
             'input_size': self.input_size,
             'output_size': self.output_size,
             'activation': self.activation_fn,
-            'init_type': self.init_type
+            'init_type': self.init_type,
+            'using_gpu': USING_GPU,
+            'device': get_device() if CUPY_AVAILABLE else 'cpu'
         }
 
     def __str__(self) -> str:
         """String representation of the layer."""
-        return f"ReactiveLayer({self.input_size}→{self.output_size}, {self.activation_fn})"
+        device = "GPU" if USING_GPU else "CPU"
+        return f"ReactiveLayer({self.input_size}→{self.output_size}, {self.activation_fn}, {device})"

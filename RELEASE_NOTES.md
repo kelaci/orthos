@@ -20,6 +20,11 @@ We are thrilled to announce the open-source release of **GAIA v4.1.0** (Generali
 - **New Benchmark Suite**: Included `benchmark.py` to evaluate hierarchical scaling.
 - **Performance**: Achieves >13,000 steps/sec on a 10-level deep hierarchy (single threaded).
 
+### 4. 🚀 GPU Acceleration (Hybrid)
+- **Dynamic Dispatch**: Implemented `gpu_utils` and refactored core tensors/layers (`ReactiveLayer`, `HebbianCore`) to automatically switch between **NumPy** (CPU) and **CuPy** (GPU) based on availability.
+- **Seamless Fallback**: Systems without GPU/CuPy gracefully fall back to optimized CPU execution.
+- **Benchmark**: Included `examples/gpu_benchmark.py` to verify speedups.
+
 ## 🛠️ Full Changelog
 
 - **Added**: `pyproject.toml`, `MANIFEST.in` for PyPI distribution readiness.

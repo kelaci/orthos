@@ -9,6 +9,7 @@ from typing import Dict, Optional, List, Tuple, Any
 from gaia.core.base import PlasticComponent
 from gaia.core.types import Tensor, PlasticityParams
 from gaia.core.tensor import initialize_weights
+from gaia.core.gpu_utils import get_array_module
 
 class HebbianCore(PlasticComponent):
     """
@@ -62,11 +63,12 @@ class HebbianCore(PlasticComponent):
 
     def _initialize_parameters(self) -> None:
         """Initialize weights and activity traces."""
+        from gaia.core.gpu_utils import zeros, get_array_module
         self.weights = initialize_weights((self.output_size, self.input_size), 'he')
-        self.pre_synaptic = np.zeros(self.input_size)
-        self.post_synaptic = np.zeros(self.output_size)
+        self.pre_synaptic = zeros((self.input_size,))
+        self.post_synaptic = zeros((self.output_size,))
 
-    def forward(self, x: np.ndarray) -> np.ndarray:
+    def forward(self, x: Tensor) -> Tensor:
         """
         Forward pass through the Hebbian core.
 
@@ -79,22 +81,26 @@ class HebbianCore(PlasticComponent):
         Raises:
             ValueError: If input shape doesn't match expected dimensions
         """
+        xp = get_array_module()
+        
         if x.shape[1] != self.input_size:
             raise ValueError(f"Input size mismatch: expected {self.input_size}, got {x.shape[1]}")
 
         # Update activity traces (average over batch)
-        self.pre_synaptic = x.mean(axis=0)
-        output = np.dot(x, self.weights.T)
-        self.post_synaptic = output.mean(axis=0)
+        # Handle both numpy and cupy
+        self.pre_synaptic = xp.mean(x, axis=0)
+        output = xp.dot(x, self.weights.T)
+        self.post_synaptic = xp.mean(output, axis=0)
 
-        # Store activity history
+        # Store activity history (keep on same device or move to CPU if needed for logging?)
+        # For performance, keep on device. But copy() is needed.
         self.activity_history.append((self.pre_synaptic.copy(), self.post_synaptic.copy()))
         if len(self.activity_history) > 100:  # Limit history size
             self.activity_history.pop(0)
 
         return output
 
-    def backward(self, grad: np.ndarray) -> np.ndarray:
+    def backward(self, grad: Tensor) -> Tensor:
         """
         Backward pass for gradient computation.
 
@@ -104,9 +110,8 @@ class HebbianCore(PlasticComponent):
         Returns:
             Gradient for previous layer
         """
-        # Hebbian layers are typically local, but if part of a global gradient flow:
-        # returns grad @ weights
-        return np.dot(grad, self.weights)
+        xp = get_array_module()
+        return xp.dot(grad, self.weights)
 
     def update(self, lr: Optional[float] = None) -> None:
         """
@@ -114,32 +119,28 @@ class HebbianCore(PlasticComponent):
 
         Args:
             lr: Optional learning rate override
-
-        TODO:
-            - Implement STDP (Spike-Timing Dependent Plasticity)
-            - Add support for different plasticity rules
-            - Optimize for computational efficiency
         """
+        xp = get_array_module()
         effective_lr = lr if lr is not None else self.plasticity_params['learning_rate']
 
         if self.plasticity_rule == 'hebbian':
             # Classic Hebbian: Δw = η * pre * post
-            weight_update = effective_lr * np.outer(self.post_synaptic, self.pre_synaptic)
+            weight_update = effective_lr * xp.outer(self.post_synaptic, self.pre_synaptic)
         elif self.plasticity_rule == 'oja':
             # Oja's rule: Δw = η * post * (pre - post * w)
-            weight_update = effective_lr * np.outer(
+            weight_update = effective_lr * xp.outer(
                 self.post_synaptic,
-                self.pre_synaptic - np.dot(self.weights.T, self.post_synaptic)
+                self.pre_synaptic - xp.dot(self.weights.T, self.post_synaptic)
             )
         elif self.plasticity_rule == 'bcm':
             # BCM rule with sliding threshold
             theta = self.plasticity_params['bcm_theta']
-            weight_update = effective_lr * np.outer(
+            weight_update = effective_lr * xp.outer(
                 self.post_synaptic * (self.post_synaptic - theta),
                 self.pre_synaptic
             )
             # Update threshold based on post-synaptic activity
-            self.plasticity_params['bcm_theta'] = 0.9 * theta + 0.1 * np.mean(self.post_synaptic)
+            self.plasticity_params['bcm_theta'] = 0.9 * theta + 0.1 * float(xp.mean(self.post_synaptic))
         else:
             raise ValueError(f"Unknown plasticity rule: {self.plasticity_rule}")
 
@@ -159,22 +160,24 @@ class HebbianCore(PlasticComponent):
         Implements synaptic scaling and weight normalization to prevent
         runaway excitation and maintain stability.
         """
+        xp = get_array_module()
         strength = self.plasticity_params.get('homeostatic_strength', 0.1)
         
         # 1. Synaptic scaling toward target mean activity
         target_activity = 0.5
-        current_activity = np.mean(self.post_synaptic)
+        current_activity = xp.mean(self.post_synaptic)
         scaling_factor = 1.0 + strength * (target_activity - current_activity)
         self.weights *= scaling_factor
 
         # 2. Weight normalization (L2 norm per neuron)
-        norm = np.linalg.norm(self.weights, axis=1, keepdims=True)
+        norm = xp.linalg.norm(self.weights, axis=1, keepdims=True)
         self.weights = self.weights / (norm + 1e-8)
 
     def reset_state(self) -> None:
         """Reset internal state."""
-        self.pre_synaptic = np.zeros(self.input_size)
-        self.post_synaptic = np.zeros(self.output_size)
+        from gaia.core.gpu_utils import zeros
+        self.pre_synaptic = zeros((self.input_size,))
+        self.post_synaptic = zeros((self.output_size,))
         self.activity_history = []
 
     def get_plasticity_params(self) -> PlasticityParams:
