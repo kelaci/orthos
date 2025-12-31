@@ -1,8 +1,7 @@
 """
 GAIA - Hierarchical Neural Architecture with Temporal Abstraction and Meta-Learning
 
-GAIA v4/v4.1 provides a modular framework for hierarchical processing,
-Hebbian learning, and meta-learning of plasticity parameters.
+GAIA v4.2 introduces Sparse Attention and Structural Plasticity (SAS).
 """
 
 from .core import *
@@ -13,7 +12,7 @@ from .meta_learning import *
 from .utils import *
 from .config import *
 
-__version__ = "4.1.0"
+__version__ = "4.2.0"
 __author__ = "GAIA Development Team"
 __license__ = "MIT"
 __all__ = [
@@ -22,7 +21,7 @@ __all__ = [
     'Tensor', 'Shape', 'PlasticityParams', 'LearningRate', 'TimeStep',
 
     # Layers
-    'ReactiveLayer', 'HebbianCore', 'TemporalLayer',
+    'ReactiveLayer', 'HebbianCore', 'TemporalLayer', 'SparseAttentionLayer', 'MaskedLinear',
 
     # Hierarchy
     'HierarchicalLevel', 'HierarchyManager',
@@ -30,6 +29,8 @@ __all__ = [
     # Plasticity
     'PlasticityController', 'EvolutionaryStrategy',
     'PlasticityRule', 'HebbianRule', 'OjasRule', 'BCMRule',
+    'StructuralOptimizer', 'SynapticConsolidation', 
+    'SparsityScheduler', 'StructuralGuardrails', 'SparsityMonitor',
 
     # Meta Learning
     'MetaOptimizer',

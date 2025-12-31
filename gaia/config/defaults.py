@@ -29,6 +29,18 @@ DEFAULT_PLASTICITY_CONFIG: Dict[str, float] = {
     "stdp_tau": 20.0             # STDP time constant
 }
 
+# Default Sparse Attention and Structural Plasticity configuration
+DEFAULT_SPARSE_CONFIG: Dict[str, Any] = {
+    "sparsity_target": 0.1,         # Target connectivity density (10%)
+    "activation_sparsity": 0.2,     # kWTA fraction (20% active)
+    "prune_threshold": 0.01,        # Weight magnitude threshold for pruning
+    "regrow_fraction": 0.05,        # Fraction of synapses to regrow per cycle
+    "consolidation_strength": 0.5,  # Importance-based protection strength
+    "maturity_age": 50,             # Steps before a synapse can be pruned
+    "block_size": 1,                # Size of sparsity blocks
+    "rewire_interval": 100          # Steps between rewiring cycles
+}
+
 # Default ES (Evolutionary Strategy) configuration
 DEFAULT_ES_CONFIG: Dict[str, Any] = {
     "population_size": 50,
@@ -59,6 +71,12 @@ DEFAULT_LAYER_CONFIGS: Dict[str, Dict[str, Any]] = {
         "time_window": 10,
         "recurrent_init": "he",
         "state_normalization": True
+    },
+    "sparse_attention": {
+        "sparsity_target": 0.1,
+        "activation_sparsity": 0.2,
+        "n_heads": 4,
+        "block_size": 1
     }
 }
 
@@ -120,6 +138,8 @@ def get_default_config(component: str) -> Dict[str, Any]:
         return DEFAULT_VIS_CONFIG.copy()
     elif component == 'log':
         return DEFAULT_LOG_CONFIG.copy()
+    elif component == 'sparse':
+        return DEFAULT_SPARSE_CONFIG.copy()
     else:
         raise ValueError(f"Unknown component: {component}")
 
@@ -134,7 +154,7 @@ def validate_config(config: Dict[str, Any], config_type: str) -> bool:
     Returns:
         True if configuration is valid, False otherwise
     """
-    if config_type not in ['hierarchy', 'plasticity', 'es', 'layers', 'meta', 'vis', 'log']:
+    if config_type not in ['hierarchy', 'plasticity', 'es', 'layers', 'meta', 'vis', 'log', 'sparse']:
         return False
         
     # Get reference default to check types against
@@ -220,6 +240,16 @@ CONFIG_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
         'outer_optimizer': 'Optimizer for outer loop (adam, sgd, rmsprop)',
         'adaptation_strategy': 'Task sampling strategy (uniform, curriculum)',
         'evaluation_interval': 'Steps between performance evaluations'
+    },
+    'sparse': {
+        'sparsity_target': 'Target connectivity density (fraction of active synapses)',
+        'activation_sparsity': 'kWTA fraction (fraction of active neurons/attention scores)',
+        'prune_threshold': 'Weight magnitude threshold for pruning',
+        'regrow_fraction': 'Fraction of synapses to regrow per cycle',
+        'consolidation_strength': 'Strength of importance-based protection',
+        'maturity_age': 'Minimum steps before a synapse becomes eligible for pruning',
+        'block_size': 'Size of structural sparsity blocks',
+        'rewire_interval': 'Steps between structural rewiring cycles'
     }
 }
 
