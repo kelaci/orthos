@@ -196,18 +196,24 @@ pip install torch torchvision
 
 ## 📖 Documentation
 
-### 📚 Full Documentation
-
-Visit the [docs/](docs/) directory for comprehensive documentation:
+The documentation has been consolidated for efficiency:
 
 | Document | Description |
 |----------|-------------|
-| [📖 Docs Hub](docs/README.md) | Documentation home |
-| [🏗️ Architecture Overview](docs/architecture/overview.md) | System design |
-| [🔬 Theoretical Foundations](docs/science/theoretical-foundations.md) | Scientific basis |
-| [📘 Quickstart Guide](docs/guides/quickstart.md) | Getting started |
-| [✅ Validation Guide](docs/guides/validation.md) | Testing & diagnostics |
-| [🔮 Future Directions](docs/research/future-directions.md) | Research roadmap |
+| [🏗️ ARCHITECTURE.md](ARCHITECTURE.md) | System design, core components, and hierarchical processing |
+| [🔬 SCIENCE.md](SCIENCE.md) | Theoretical foundations, Active Inference, and research directions |
+| [📘 GUIDES.md](GUIDES.md) | Quickstart, GPU usage, validation, and PyTorch integration |
+| [🗺️ ROADMAP.md](ROADMAP.md) | Development roadmap and version milestones |
+| [🤖 .agent/docs/README.md](.agent/docs/README.md) | **Onboarding & SOPs for AI Agents** |
+
+---
+
+## 🤖 Agentic Support
+
+This repository is **Agent-Ready**. If you are an AI agent:
+1. Start with [.agent/docs/README.md](.agent/docs/README.md).
+2. Follow the instructions in [.agent/instructions.md](.agent/instructions.md).
+3. Use the workflows in [.agent/workflows/](.agent/workflows/).
 
 ### 🎓 Key Concepts
 
@@ -307,7 +313,11 @@ gaia/
 │       ├── plasticity_demo.py
 │       └── meta_learning_demo.py
 │
-└── 📁 docs/                     ← Documentation
+├── 📁 .agent/                   ← Agent configurations
+│   ├── 📁 docs/                 ← Agent-specific documentation
+│   └── 📁 workflows/            ← Agent high-efficiency paths
+│
+└── 📁 docs/                     ← General documentation
     ├── architecture/            ← System design docs
     ├── science/                 ← Theoretical foundations
     ├── guides/                  ← How-to guides

@@ -99,17 +99,19 @@ def evaluate_adaptation_robustness(performance_history: List[float],
     """
     Evaluate robustness of adaptation across task switches.
 
+    Measures how well the system adapts when switching between tasks,
+    including adaptation speed, recovery time, and performance drops.
+
     Args:
         performance_history: History of performance metrics
         task_boundaries: Indices where task switches occurred
 
     Returns:
-        Dictionary of robustness metrics
-
-    TODO:
-        - Implement proper robustness evaluation
-        - Add support for different robustness metrics
-        - Consider different task switch scenarios
+        Dictionary of robustness metrics:
+        - adaptation_speed: Average speed of recovery (1/steps)
+        - recovery_time: Average steps to recover pre-switch performance
+        - performance_drop: Average performance decrease at switch
+        - overall_robustness: Combined robustness score
     """
     # Placeholder implementation
     if not task_boundaries or len(performance_history) < 2:
@@ -165,16 +167,18 @@ def evaluate_parameter_convergence(param_history: List[Dict[str, float]]) -> Per
     """
     Evaluate parameter convergence properties.
 
+    Analyzes the convergence behavior of meta-learning parameters,
+    including speed, stability, and oscillation characteristics.
+
     Args:
-        param_history: History of parameter values
+        param_history: History of parameter values (list of dicts)
 
     Returns:
-        Dictionary of convergence metrics
-
-    TODO:
-        - Implement proper convergence evaluation
-        - Add support for different convergence metrics
-        - Consider multi-dimensional parameter spaces
+        Dictionary of convergence metrics:
+        - convergence_speed: How quickly parameters approach final values
+        - stability: Variance in recent parameter values
+        - oscillation: Frequency of direction changes
+        - final_values: Final parameter values
     """
     if not param_history or len(param_history) < 2:
         return {

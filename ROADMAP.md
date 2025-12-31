@@ -36,7 +36,7 @@
 - [ ] Parameter transfer between tasks
 
 #### Hierarchy Improvements
-- [ ] Attention mechanisms for hierarchical processing
+- [ ] [Attention mechanisms (SAS Spec)](docs/architecture/features/sparse_attention.md)
 - [ ] Dynamic hierarchy management
 - [ ] Cross-level communication protocols
 - [ ] Hierarchy optimization algorithms
@@ -163,10 +163,10 @@
 ## 🔗 Resources
 
 ### Documentation
-- [Architecture Overview](../architecture/overview.md)
+- [Architecture Overview](ARCHITECTURE.md)
 - [Core Components](../architecture/core-components.md)
 - [Hierarchy System](../architecture/hierarchy.md)
-- [Plasticity System](../architecture/plasticity-system.md)
+- [Plasticity System](ARCHITECTURE.md)
 
 ### Development
 - [Contributing](contributing.md)

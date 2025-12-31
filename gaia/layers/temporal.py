@@ -44,7 +44,7 @@ class TemporalLayer(Layer, PlasticComponent):
         self.hidden_size = hidden_size
         self.time_window = time_window
         self.hidden_state = None
-        self.activation = activation
+        self.activation_name = activation
         self.recurrent_weights = None
         self.state_history: List[np.ndarray] = []
         self.plasticity_params = {
@@ -89,7 +89,7 @@ class TemporalLayer(Layer, PlasticComponent):
         self.last_pre_activation = np.dot(x, self.weights.T) + np.dot(self.hidden_state, self.recurrent_weights.T)
 
         # Apply activation
-        output = apply_activation(self.last_pre_activation, self.activation)
+        output = self.activation(self.last_pre_activation)
 
         # Update hidden state (average over batch)
         self.hidden_state = output.mean(axis=0)
@@ -100,6 +100,18 @@ class TemporalLayer(Layer, PlasticComponent):
             self.state_history.pop(0)
 
         return output
+
+    def activation(self, x: np.ndarray) -> np.ndarray:
+        """
+        Apply activation function to input.
+
+        Args:
+            x: Input tensor
+
+        Returns:
+            Activated tensor
+        """
+        return apply_activation(x, self.activation_name)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         """
@@ -115,7 +127,7 @@ class TemporalLayer(Layer, PlasticComponent):
             raise ValueError("Forward pass must be called before backward pass")
 
         # Derivative of activation
-        da = apply_activation_derivative(self.last_pre_activation, self.activation)
+        da = apply_activation_derivative(self.last_pre_activation, self.activation_name)
         delta = grad * da
 
         # Gradient with respect to input: delta @ weights
@@ -170,18 +182,6 @@ class TemporalLayer(Layer, PlasticComponent):
         """
         return self.state_history[-steps:]
 
-    def activation(self, x: np.ndarray) -> np.ndarray:
-        """
-        Apply activation function to input.
-
-        Args:
-            x: Input tensor
-
-        Returns:
-            Activated tensor
-        """
-        return apply_activation(x, self.activation)
-
     def get_weights(self) -> np.ndarray:
         """
         Get current weight matrix.
@@ -229,7 +229,7 @@ class TemporalLayer(Layer, PlasticComponent):
             'input_size': self.input_size,
             'hidden_size': self.hidden_size,
             'time_window': self.time_window,
-            'activation': self.activation
+            'activation': self.activation_name
         }
 
     def __str__(self) -> str:

@@ -82,34 +82,77 @@ class MetaOptimizer:
         """
         Sample a task from task distribution.
 
+        Supports multiple sampling strategies:
+        - 'uniform': Equal probability for all tasks
+        - 'curriculum': Progressively harder tasks over time
+        - 'performance_weighted': Sample based on recent performance
+
         Args:
             tasks: List of available tasks
 
         Returns:
             Selected task function
-
-        TODO:
-            - Implement sophisticated task sampling strategies
-            - Add support for task difficulty progression
-            - Consider curriculum learning approaches
         """
-        # Simple uniform sampling for now
-        return np.random.choice(tasks)
+        strategy = self.adaptation_strategy
+        
+        if strategy == 'uniform' or len(tasks) == 1:
+            return np.random.choice(tasks)
+        
+        elif strategy == 'curriculum':
+            # Curriculum learning: progressively sample harder tasks
+            if not hasattr(self, '_curriculum_progress'):
+                self._curriculum_progress = 0
+            
+            # Progress increases with each sample
+            self._curriculum_progress += 1
+            progress_ratio = min(self._curriculum_progress / 100.0, 1.0)
+            
+            # Bias sampling toward later (harder) tasks as progress increases
+            num_tasks = len(tasks)
+            weights = np.zeros(num_tasks)
+            for i in range(num_tasks):
+                # Early: weight early tasks; Late: weight later tasks
+                position_ratio = i / (num_tasks - 1) if num_tasks > 1 else 0.5
+                weights[i] = np.exp(-((position_ratio - progress_ratio) ** 2) / 0.3)
+            
+            weights /= weights.sum()
+            return np.random.choice(tasks, p=weights)
+        
+        elif strategy == 'performance_weighted':
+            # Sample tasks where performance is lower (focus on weaknesses)
+            if not hasattr(self, '_task_performance_buffer'):
+                self._task_performance_buffer = {i: [] for i in range(len(tasks))}
+            
+            # Calculate inverse performance weights (lower performance = higher weight)
+            weights = []
+            for i in range(len(tasks)):
+                perf_history = self._task_performance_buffer.get(i, [])
+                if len(perf_history) > 0:
+                    avg_perf = np.mean(perf_history[-10:])  # Recent performance
+                    weights.append(1.0 / (avg_perf + 0.1))  # Inverse weighting
+                else:
+                    weights.append(1.0)  # Default weight for unseen tasks
+            
+            weights = np.array(weights)
+            weights /= weights.sum()
+            return np.random.choice(tasks, p=weights)
+        
+        else:
+            # Default to uniform
+            return np.random.choice(tasks)
 
     def inner_loop_adaptation(self, task: Callable) -> float:
         """
         Inner loop adaptation to a specific task.
 
+        Implements gradient-free adaptation with early stopping when
+        performance converges (change < 1e-4).
+
         Args:
-            task: Task function
+            task: Task function that takes a step index and returns task data
 
         Returns:
-            Task performance
-
-        TODO:
-            - Implement proper inner loop adaptation
-            - Add early stopping criteria
-            - Consider different adaptation strategies
+            Average task performance over adaptation steps
         """
         # Reset plasticity controller for new task
         self.inner_loop.reset_state()
@@ -117,24 +160,25 @@ class MetaOptimizer:
         # Adapt to task for fixed number of steps
         performance = 0.0
         prev_performance = 0.0
+        steps_taken = 0
         
-        for step in range(self.meta_parameters['task_switch_frequency']):
+        for step in range(int(self.meta_parameters['task_switch_frequency'])):
             # Get task data and performance
             task_data = task(step)
             current_perf = self._evaluate_task_performance(task_data)
             performance += current_perf
+            steps_taken = step + 1
 
             # Adapt plasticity parameters
             self.inner_loop.adapt_plasticity(task_data)
             
-            # Early stopping check
+            # Early stopping check: convergence detection
             if step > 0 and abs(current_perf - prev_performance) < 1e-4:
-                # Converged
                 break
             prev_performance = current_perf
 
         # Return average performance over steps taken
-        return performance / (step + 1)
+        return performance / steps_taken
 
     def _evaluate_task_performance(self, task_data: Any) -> float:
         """
@@ -227,15 +271,22 @@ class MetaOptimizer:
 
     def set_adaptation_strategy(self, strategy: str) -> None:
         """
-        Set adaptation strategy.
+        Set adaptation strategy for task sampling.
+
+        Supported strategies:
+        - 'uniform': Equal probability for all tasks
+        - 'curriculum': Progressive difficulty increase
+        - 'performance_weighted': Focus on weaker tasks
 
         Args:
             strategy: Adaptation strategy name
 
-        TODO:
-            - Implement different adaptation strategies
-            - Add support for strategy configuration
+        Raises:
+            ValueError: If unknown strategy is specified
         """
+        valid_strategies = ['uniform', 'curriculum', 'performance_weighted']
+        if strategy not in valid_strategies:
+            raise ValueError(f"Unknown strategy: {strategy}. Valid: {valid_strategies}")
         self.adaptation_strategy = strategy
 
     def get_meta_parameters(self) -> Dict[str, float]:

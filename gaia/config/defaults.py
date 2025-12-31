@@ -133,14 +133,34 @@ def validate_config(config: Dict[str, Any], config_type: str) -> bool:
 
     Returns:
         True if configuration is valid, False otherwise
-
-    TODO:
-        - Implement proper configuration validation
-        - Add support for different configuration types
-        - Consider schema-based validation
     """
-    # Placeholder implementation
-    return True
+    if config_type not in ['hierarchy', 'plasticity', 'es', 'layers', 'meta', 'vis', 'log']:
+        return False
+        
+    # Get reference default to check types against
+    try:
+        if config_type == 'layers':
+            # Layers usually have nested structure, validate against generic layer config
+            # or check for required keys like 'reactive', 'hebbian', etc.
+            return all(isinstance(v, dict) for v in config.values())
+        
+        default_ref = get_default_config(config_type)
+        
+        for key, value in config.items():
+            if key not in default_ref:
+                # Unknown key
+                continue
+            
+            expected_type = type(default_ref[key])
+            if not isinstance(value, expected_type):
+                # Allow int for float and vice versa if they are numbers
+                if isinstance(value, (int, float)) and isinstance(default_ref[key], (int, float)):
+                    continue
+                return False
+                
+        return True
+    except Exception:
+        return False
 
 def merge_configs(base_config: Dict[str, Any], override_config: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -151,17 +171,57 @@ def merge_configs(base_config: Dict[str, Any], override_config: Dict[str, Any]) 
         override_config: Override configuration
 
     Returns:
-        Merged configuration
-
-    TODO:
-        - Implement proper configuration merging
-        - Add support for nested dictionaries
-        - Consider different merge strategies
+        Merged configuration with recursive nested dict support
     """
-    # Simple merge for now
     merged = base_config.copy()
-    merged.update(override_config)
+    
+    for key, value in override_config.items():
+        if key in merged and isinstance(merged[key], dict) and isinstance(value, dict):
+            # Recursive merge for nested dictionaries
+            merged[key] = merge_configs(merged[key], value)
+        else:
+            merged[key] = value
+            
     return merged
+
+# Configuration parameter descriptions
+CONFIG_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
+    'hierarchy': {
+        'num_levels': 'Number of hierarchical levels in the architecture',
+        'temporal_compression': 'Time compression factor between levels',
+        'base_resolution': 'Temporal resolution at the base level',
+        'level_sizes': 'Feature dimensions at each level',
+        'communication_interval': 'Steps between inter-level communication',
+        'max_levels': 'Maximum allowed number of levels',
+        'min_levels': 'Minimum required number of levels'
+    },
+    'plasticity': {
+        'learning_rate': 'Base learning rate for weight updates',
+        'ltp_coefficient': 'Long-Term Potentiation strength multiplier',
+        'ltd_coefficient': 'Long-Term Depression strength multiplier',
+        'decay_rate': 'Weight decay rate for regularization',
+        'homeostatic_strength': 'Strength of homeostatic regulation',
+        'bcm_theta': 'BCM rule sliding threshold',
+        'stdp_tau': 'STDP time constant (ms)'
+    },
+    'es': {
+        'population_size': 'Number of individuals in ES population',
+        'sigma': 'Mutation strength (standard deviation)',
+        'learning_rate': 'Learning rate for mean parameter updates',
+        'elite_fraction': 'Fraction of top performers to select',
+        'max_sigma': 'Maximum allowed mutation strength',
+        'min_sigma': 'Minimum allowed mutation strength',
+        'adaptation_rate': 'Rate of sigma adaptation'
+    },
+    'meta': {
+        'num_episodes': 'Number of meta-training episodes',
+        'task_switch_frequency': 'Steps before switching tasks',
+        'performance_threshold': 'Target performance threshold',
+        'outer_optimizer': 'Optimizer for outer loop (adam, sgd, rmsprop)',
+        'adaptation_strategy': 'Task sampling strategy (uniform, curriculum)',
+        'evaluation_interval': 'Steps between performance evaluations'
+    }
+}
 
 def get_config_template(component: str) -> Dict[str, Any]:
     """
@@ -171,12 +231,17 @@ def get_config_template(component: str) -> Dict[str, Any]:
         component: Component name
 
     Returns:
-        Configuration template with descriptions
-
-    TODO:
-        - Implement proper configuration templates
-        - Add descriptions for each parameter
-        - Consider different template formats
+        Configuration template with value and description for each parameter
     """
-    # Placeholder implementation
-    return get_default_config(component)
+    defaults = get_default_config(component)
+    descriptions = CONFIG_DESCRIPTIONS.get(component, {})
+    
+    template = {}
+    for key, value in defaults.items():
+        template[key] = {
+            'value': value,
+            'description': descriptions.get(key, 'No description available'),
+            'type': type(value).__name__
+        }
+    
+    return template

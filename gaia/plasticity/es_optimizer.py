@@ -98,6 +98,9 @@ class EvolutionaryStrategy:
             np.array(elites) - current_mean,
             axis=0
         )
+        
+        # Clamp parameters to reasonable bounds [0.0001, 1.0]
+        self.mean = np.clip(self.mean, 0.0001, 1.0)
 
         # Store average fitness
         self.fitness_history.append(np.mean(fitness_scores))

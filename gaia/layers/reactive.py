@@ -18,6 +18,11 @@ try:
         CUPY_AVAILABLE
     )
     USING_GPU = get_device() == 'cuda'
+    # Define xp for array operations
+    if CUPY_AVAILABLE:
+        import cupy as xp
+    else:
+        import numpy as xp
 except ImportError:
     import numpy as xp
     zeros = lambda shape, **kwargs: np.zeros(shape, **kwargs)
@@ -107,14 +112,29 @@ class ReactiveLayer(Layer):
         output = dot(x, self.weights.T) + self.biases
 
         # Apply activation
+        return self.activation(output)
+
+    def activation(self, x: Tensor) -> Tensor:
+        """
+        Apply activation function.
+
+        Args:
+            x: Input tensor
+
+        Returns:
+            Activated tensor
+            
+        Raises:
+            ValueError: If unknown activation function
+        """
         if self.activation_fn == 'relu':
-            output = xp.maximum(0, output)
+            return xp.maximum(0, x)
         elif self.activation_fn == 'sigmoid':
-            output = 1.0 / (1.0 + xp.exp(-output))
+            return 1.0 / (1.0 + xp.exp(-x))
         elif self.activation_fn == 'tanh':
-            output = xp.tanh(output)
+            return xp.tanh(x)
         elif self.activation_fn == 'linear':
-            pass  # output is already linear
+            return x
         else:
             raise ValueError(f"Unknown activation: {self.activation_fn}")
 
