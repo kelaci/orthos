@@ -1,5 +1,5 @@
 ---
-description: Diagnostic path for fixing test failures in GAIA
+description: Diagnostic path for fixing test failures in ORTHOS
 ---
 # Fix Test Workflow
 

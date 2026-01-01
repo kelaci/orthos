@@ -1,8 +1,8 @@
 # Quick Start Guide
 
-## 🚀 Getting Started with GAIA
+## 🚀 Getting Started with ORTHOS
 
-Welcome to GAIA! This guide will help you set up and run your first GAIA experiment.
+Welcome to ORTHOS! This guide will help you set up and run your first ORTHOS experiment.
 
 ## 📋 Prerequisites
 
@@ -25,33 +25,33 @@ scipy>=1.7.0
 
 ```bash
 # Clone the repository
-git clone git@github.com:kelaci/gaia.git
-cd gaia
+git clone git@github.com:kelaci/orthos.git
+cd orthos
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Install GAIA in development mode
+# Install ORTHOS in development mode
 pip install -e .
 ```
 
 ### Using pip (coming soon)
 ```bash
-pip install gaia-ai
+pip install orthos-ai
 ```
 
 ## 🎯 Basic Usage
 
-### Import GAIA Components
+### Import ORTHOS Components
 
 ```python
 import numpy as np
-from gaia.layers.reactive import ReactiveLayer
-from gaia.layers.hebbian import HebbianCore
-from gaia.layers.temporal import TemporalLayer
-from gaia.hierarchy.level import HierarchicalLevel
-from gaia.hierarchy.manager import HierarchyManager
-from gaia.plasticity.controller import PlasticityController
+from orthos.layers.reactive import ReactiveLayer
+from orthos.layers.hebbian import HebbianCore
+from orthos.layers.temporal import TemporalLayer
+from orthos.hierarchy.level import HierarchicalLevel
+from orthos.hierarchy.manager import HierarchyManager
+from orthos.plasticity.controller import PlasticityController
 ```
 
 ### Create a Simple Hierarchy
@@ -143,7 +143,7 @@ print("\nAdaptation completed!")
 ### Plot Learning Curve
 
 ```python
-from gaia.utils.visualization import plot_learning_curve
+from orthos.utils.visualization import plot_learning_curve
 
 plot_learning_curve(performance_history, title="Plasticity Adaptation")
 ```
@@ -151,7 +151,7 @@ plot_learning_curve(performance_history, title="Plasticity Adaptation")
 ### Plot Hierarchy Representations
 
 ```python
-from gaia.utils.visualization import plot_hierarchy_representations
+from orthos.utils.visualization import plot_hierarchy_representations
 
 # Use a subset of representations for visualization
 sample_reps = {level: reps[:10] for level, reps in representations.items()}
@@ -163,7 +163,7 @@ plot_hierarchy_representations(sample_reps)
 ### Meta-Optimization Setup
 
 ```python
-from gaia.meta_learning.optimizer import MetaOptimizer
+from orthos.meta_learning.optimizer import MetaOptimizer
 
 # Create meta-optimizer
 meta_optimizer = MetaOptimizer(controller)
@@ -201,7 +201,7 @@ for key, value in metrics.items():
 ### Setup Logging
 
 ```python
-from gaia.utils.logging import setup_logging
+from orthos.utils.logging import setup_logging
 
 # Setup comprehensive logging
 logger = setup_logging(
@@ -210,13 +210,13 @@ logger = setup_logging(
     log_file='gaia_demo.log'
 )
 
-logger.info("Starting GAIA demo")
+logger.info("Starting ORTHOS demo")
 ```
 
 ### Log Tensor Statistics
 
 ```python
-from gaia.utils.logging import log_tensor_stats
+from orthos.utils.logging import log_tensor_stats
 
 # Log statistics about input data
 log_tensor_stats(logger, input_data, "input_data", level='INFO')
@@ -234,20 +234,20 @@ log_tensor_stats(logger, input_data, "input_data", level='INFO')
 - Experiment with different plasticity rules
 - Create custom hierarchical configurations
 - Implement your own tasks for meta-learning
-- Extend GAIA with new layer types
+- Extend ORTHOS with new layer types
 
-### Contribute to GAIA
+### Contribute to ORTHOS
 - [Development Roadmap](ROADMAP.md)
 - [Contributing Guidelines](../development/contributing.md)
-- [Issue Tracker](https://github.com/kelaci/gaia/issues)
+- [Issue Tracker](https://github.com/kelaci/orthos/issues)
 
 ## 🎯 Troubleshooting
 
 ### Common Issues
 
 **Import Errors**
-- Ensure GAIA is installed (`pip install -e .`)
-- Check Python path includes the gaia directory
+- Ensure ORTHOS is installed (`pip install -e .`)
+- Check Python path includes the orthos directory
 
 **Performance Issues**
 - Reduce input data size for testing
@@ -265,9 +265,9 @@ log_tensor_stats(logger, input_data, "input_data", level='INFO')
 - **Documentation**: Check the comprehensive docs
 - **Community**: Join the Slack channel (link coming soon)
 
-## 📋 Checklist for Your First GAIA Project
+## 📋 Checklist for Your First ORTHOS Project
 
-1. [ ] Install GAIA and dependencies
+1. [ ] Install ORTHOS and dependencies
 2. [ ] Run the basic hierarchy example
 3. [ ] Experiment with plasticity control
 4. [ ] Try the meta-learning example
@@ -276,15 +276,15 @@ log_tensor_stats(logger, input_data, "input_data", level='INFO')
 7. [ ] Visualize your results
 8. [ ] Share your findings with the community!
 
-This quick start guide provides everything you need to begin exploring GAIA's hierarchical neural architecture and meta-learning capabilities!# GPU Acceleration Guide for GAIA v4.x
+This quick start guide provides everything you need to begin exploring ORTHOS's hierarchical neural architecture and meta-learning capabilities!# GPU Acceleration Guide for ORTHOS v4.x
 
-This guide explains how to use GPU acceleration with GAIA's NumPy-based implementation using CuPy.
+This guide explains how to use GPU acceleration with ORTHOS's NumPy-based implementation using CuPy.
 
 ---
 
 ## 📊 Overview
 
-GAIA v4.x (NumPy version) now supports GPU acceleration through **CuPy**, providing:
+ORTHOS v4.x (NumPy version) now supports GPU acceleration through **CuPy**, providing:
 
 - **10-50x speedup** for matrix operations
 - **Automatic GPU/CPU switching**
@@ -315,7 +315,7 @@ GAIA v4.x (NumPy version) now supports GPU acceleration through **CuPy**, provid
 ### Verify Installation
 
 ```python
-from gaia.core.gpu_utils import get_device_info
+from orthos.core.gpu_utils import get_device_info
 
 info = get_device_info()
 print(f"CUDA Available: {info['cuda_available']}")
@@ -336,10 +336,10 @@ Memory: 24.00 GB
 
 ### Automatic Device Selection
 
-GAIA automatically selects GPU when available:
+ORTHOS automatically selects GPU when available:
 
 ```python
-from gaia.core import *
+from orthos.core import *
 
 # This will use GPU if CuPy is available, CPU otherwise
 manager = HierarchyManager()
@@ -354,7 +354,7 @@ representations = manager.process_hierarchy(data, 1000)
 Force CPU or GPU usage:
 
 ```python
-from gaia.core.gpu_utils import set_device, get_device
+from orthos.core.gpu_utils import set_device, get_device
 
 # Force CPU
 set_device('cpu')
@@ -374,7 +374,7 @@ representations = manager.process_hierarchy(data, 1000)
 Automatically switch device for specific operations:
 
 ```python
-from gaia.core.gpu_utils import GPUContext
+from orthos.core.gpu_utils import GPUContext
 
 # All operations inside use GPU
 with GPUContext('cuda'):
@@ -392,7 +392,7 @@ print("Now back on CPU")
 Run the comprehensive benchmark suite:
 
 ```bash
-python -m gaia.examples.gpu_benchmark
+python -m orthos.examples.gpu_benchmark
 ```
 
 ### Expected Results
@@ -433,7 +433,7 @@ for i in range(10):
 
 **✅ Good:**
 ```python
-from gaia.core.gpu_utils import to_gpu
+from orthos.core.gpu_utils import to_gpu
 
 data = to_gpu(np.random.randn(1000, 10))  # GPU once
 result = manager.process_hierarchy(data, 1000)  # All on GPU
@@ -457,7 +457,7 @@ results = process_batch(samples)  # Better parallelism
 Automatically handle device switching:
 
 ```python
-from gaia.core.gpu_utils import GPUContext
+from orthos.core.gpu_utils import GPUContext
 
 with GPUContext():
     # All operations here use GPU
@@ -472,7 +472,7 @@ light_operation()
 For accurate timing, synchronize GPU:
 
 ```python
-from gaia.core.gpu_utils import get_device
+from orthos.core.gpu_utils import get_device
 
 if get_device() == 'cuda':
     import cupy as cp
@@ -486,7 +486,7 @@ if get_device() == 'cuda':
 ### Custom Operations with GPU Support
 
 ```python
-from gaia.core.gpu_utils import (
+from orthos.core.gpu_utils import (
     get_array_module, set_device, get_device,
     dot, matmul, outer, sum, mean, std, norm,
     zeros, ones, randn, uniform, exp, tanh, sigmoid, relu
@@ -506,14 +506,14 @@ e = mean(c, axis=0)  # Mean reduction
 f = norm(d)  # L2 norm
 
 # Move back to CPU if needed
-from gaia.core.gpu_utils import to_cpu
+from orthos.core.gpu_utils import to_cpu
 result = to_cpu(f)
 ```
 
 ### Benchmarking Your Code
 
 ```python
-from gaia.core.gpu_utils import benchmark_device
+from orthos.core.gpu_utils import benchmark_device
 
 def my_operation():
     a = randn(1000, 1000)
@@ -614,10 +614,10 @@ else:
 
 ```python
 import numpy as np
-from gaia.hierarchy.manager import HierarchyManager
-from gaia.hierarchy.level import HierarchicalLevel
-from gaia.layers.hebbian import HebbianCore
-from gaia.core.gpu_utils import set_device, to_gpu, GPUContext
+from orthos.hierarchy.manager import HierarchyManager
+from orthos.hierarchy.level import HierarchicalLevel
+from orthos.layers.hebbian import HebbianCore
+from orthos.core.gpu_utils import set_device, to_gpu, GPUContext
 
 # Enable GPU
 set_device('cuda')
@@ -669,13 +669,13 @@ print(f"Steps per second: {10000/elapsed:.0f}")
 - [CuPy Documentation](https://docs.cupy.dev/en/stable/)
 - [CuPy Installation Guide](https://docs.cupy.dev/en/stable/install.html)
 - [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads)
-- [GAIA PyTorch Integration](pytorch-integration.md)
+- [ORTHOS PyTorch Integration](pytorch-integration.md)
 
 ---
 
 ## 💡 Tips
 
-1. **Profile First**: Use `python -m gaia.examples.gpu_benchmark` to verify GPU benefits
+1. **Profile First**: Use `python -m orthos.examples.gpu_benchmark` to verify GPU benefits
 2. **Check Memory**: Monitor GPU memory with `nvidia-smi`
 3. **Batch Larger**: GPU performance scales with batch size
 4. **Stay on GPU**: Minimize CPU-GPU transfers
@@ -686,7 +686,7 @@ print(f"Steps per second: {10000/elapsed:.0f}")
 
 ## 🎉 Summary
 
-GAIA v4.x now has **full GPU support** for NumPy-based operations through CuPy:
+ORTHOS v4.x now has **full GPU support** for NumPy-based operations through CuPy:
 
 - ✅ Automatic GPU detection
 - ✅ Transparent API (no code changes)
@@ -700,7 +700,7 @@ GAIA v4.x now has **full GPU support** for NumPy-based operations through CuPy:
 
 ## 🔬 Overview
 
-This guide covers comprehensive validation procedures for GAIA systems, including stability checks, diagnostic interpretation, and troubleshooting common issues.
+This guide covers comprehensive validation procedures for ORTHOS systems, including stability checks, diagnostic interpretation, and troubleshooting common issues.
 
 ---
 
@@ -713,7 +713,7 @@ This guide covers comprehensive validation procedures for GAIA systems, includin
 python test_gaia.py
 
 # Expected output:
-# 🚀 Running GAIA v4/v4.1 Tests
+# 🚀 Running ORTHOS v4/v4.1 Tests
 # ==================================================
 # 🧪 Testing Layers...
 # ✅ ReactiveLayer test passed
@@ -732,7 +732,7 @@ from gaia_protocol import run_comprehensive_validation
 agent = run_comprehensive_validation()
 
 # Expected output:
-# 🔬 GAIA PROTOCOL v3.1 — COMPREHENSIVE VALIDATION
+# 🔬 ORTHOS PROTOCOL v3.1 — COMPREHENSIVE VALIDATION
 # ==================================================
 # Step 50:
 #   WM Loss: 0.0234 ± 0.0056
@@ -1186,7 +1186,7 @@ def run_full_validation_suite(cfg=None):
         cfg = GaiaConfigEnhanced()
     
     print("="*60)
-    print("🔬 GAIA FULL VALIDATION SUITE")
+    print("🔬 ORTHOS FULL VALIDATION SUITE")
     print("="*60)
     
     agent = GaiaAgentEnhanced(cfg)
@@ -1257,7 +1257,7 @@ if __name__ == "__main__":
 
 ```yaml
 # .github/workflows/validate.yml
-name: GAIA Validation
+name: ORTHOS Validation
 
 on: [push, pull_request]
 
@@ -1294,7 +1294,7 @@ jobs:
 
 ## 🔗 Overview
 
-GAIA exists in two complementary implementations:
+ORTHOS exists in two complementary implementations:
 - **NumPy v4.x**: Modular framework for research and prototyping
 - **PyTorch v3.1**: Production-ready implementation with GPU support
 
@@ -1322,7 +1322,7 @@ This guide explains how they relate and when to use each.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                         GAIA Architecture Mapping                        │
+│                         ORTHOS Architecture Mapping                        │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │   NumPy v4.x                          PyTorch v3.1                       │
@@ -1363,8 +1363,8 @@ This guide explains how they relate and when to use each.
 
 ```python
 # NumPy v4.x example
-from gaia.layers.hebbian import HebbianCore
-from gaia.hierarchy.manager import HierarchyManager
+from orthos.layers.hebbian import HebbianCore
+from orthos.hierarchy.manager import HierarchyManager
 
 # Create hierarchy
 manager = HierarchyManager()
@@ -1470,7 +1470,7 @@ def update(self, lr):
 # Research workflow
 import numpy as np
 import torch
-from gaia.layers.hebbian import HebbianCore  # NumPy for prototyping
+from orthos.layers.hebbian import HebbianCore  # NumPy for prototyping
 from gaia_protocol import DiagnosticPlasticLinear  # PyTorch for training
 
 # 1. Prototype with NumPy
@@ -1539,7 +1539,7 @@ PyTorch for plastic learning within levels
 
 import numpy as np
 import torch
-from gaia.hierarchy.manager import HierarchyManager
+from orthos.hierarchy.manager import HierarchyManager
 from gaia_protocol import DiagnosticPlasticLinear, GaiaConfigEnhanced
 
 class HybridHierarchicalLevel:
@@ -1585,7 +1585,7 @@ NumPy for offline analysis
 
 from gaia_protocol import GaiaAgentEnhanced
 import numpy as np
-from gaia.utils.visualization import plot_weight_matrix
+from orthos.utils.visualization import plot_weight_matrix
 
 # Train with PyTorch
 agent = GaiaAgentEnhanced(cfg)
@@ -1631,7 +1631,7 @@ pytorch_config = GaiaConfigEnhanced(
 **Step 3: Update layer creation**
 ```python
 # Old
-from gaia.layers.hebbian import HebbianCore
+from orthos.layers.hebbian import HebbianCore
 layer = HebbianCore(10, 20)
 
 # New
@@ -1659,7 +1659,7 @@ fast_trace = layer.fast_trace.cpu().numpy()
 
 **Step 2: Create NumPy layer**
 ```python
-from gaia.layers.hebbian import HebbianCore
+from orthos.layers.hebbian import HebbianCore
 numpy_layer = HebbianCore(in_size, out_size)
 numpy_layer.weights = weights.T  # Transpose for NumPy convention
 ```
@@ -1719,7 +1719,7 @@ class TestPlasticityUnified:
     
     @pytest.fixture
     def numpy_layer(self):
-        from gaia.layers.hebbian import HebbianCore
+        from orthos.layers.hebbian import HebbianCore
         return HebbianCore(10, 20)
     
     @pytest.fixture
@@ -1786,8 +1786,8 @@ class TestPlasticityUnified:
 ### 8.2 Code Organization
 
 ```
-gaia/
-├── gaia/                    # NumPy v4.x
+orthos/
+├── orthos/                    # NumPy v4.x
 │   ├── layers/
 │   ├── hierarchy/
 │   ├── plasticity/

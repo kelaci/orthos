@@ -1,10 +1,10 @@
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-from gaia.hierarchy.manager import HierarchyManager
-from gaia.hierarchy.level import HierarchicalLevel
-from gaia.layers.reactive import ReactiveLayer
-from gaia.layers.hebbian import HebbianCore
+from orthos.hierarchy.manager import HierarchyManager
+from orthos.hierarchy.level import HierarchicalLevel
+from orthos.layers.reactive import ReactiveLayer
+from orthos.layers.hebbian import HebbianCore
 
 def benchmark_hierarchy(depths=[1, 3, 5, 10], steps=1000):
     print(f"🚀 Running Scale Benchmark (Steps={steps})")
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         plt.plot(depths, sps, 'o-')
         plt.xlabel('Hierarchy Depth')
         plt.ylabel('Steps per Second')
-        plt.title('GAIA Performance Benchmark')
+        plt.title('ORTHOS Performance Benchmark')
         plt.grid(True)
         plt.savefig('benchmark_results.png')
         print("📊 Benchmark plot saved to benchmark_results.png")

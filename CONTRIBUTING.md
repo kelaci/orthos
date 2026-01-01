@@ -1,8 +1,8 @@
-# 🤝 Contributing to GAIA
+# 🤝 Contributing to ORTHOS
 
-## Welcome to the GAIA Community!
+## Welcome to the ORTHOS Community!
 
-Thank you for your interest in contributing to GAIA! This document provides guidelines for contributing to the project and following our coding standards.
+Thank you for your interest in contributing to ORTHOS! This document provides guidelines for contributing to the project and following our coding standards.
 
 ---
 
@@ -31,8 +31,8 @@ Thank you for your interest in contributing to GAIA! This document provides guid
 
 ```bash
 # Fork the repository on GitHub
-git clone https://github.com/YOUR_USERNAME/gaia.git
-cd gaia
+git clone https://github.com/YOUR_USERNAME/orthos.git
+cd orthos
 ```
 
 ### 1.3 Install Dependencies
@@ -52,7 +52,7 @@ pre-commit install
 
 ## 📖 Coding Standards
 
-GAIA follows a comprehensive coding standard documented in [CODING_STANDARD.md](CODING_STANDARD.md).
+ORTHOS follows a comprehensive coding standard documented in [CODING_STANDARD.md](CODING_STANDARD.md).
 
 ### 2.1 Key Principles
 
@@ -63,7 +63,7 @@ GAIA follows a comprehensive coding standard documented in [CODING_STANDARD.md](
 
 ### 2.2 Code Quality Tools
 
-GAIA uses several tools to maintain code quality:
+ORTHOS uses several tools to maintain code quality:
 
 | Tool | Purpose | Configuration |
 |------|---------|---------------|
@@ -81,13 +81,13 @@ GAIA uses several tools to maintain code quality:
 pre-commit run --all-files
 
 # Format code
-black gaia/ tests/
+black orthos/ tests/
 
 # Lint code
-flake8 gaia/ tests/
+flake8 orthos/ tests/
 
 # Type checking
-mypy gaia/ tests/
+mypy orthos/ tests/
 
 # Run tests
 pytest tests/
@@ -162,7 +162,7 @@ pytest tests/
 pytest tests/unit/test_tensor.py
 
 # Run tests with coverage
-pytest tests/ --cov=gaia --cov-report=html
+pytest tests/ --cov=orthos --cov-report=html
 
 # Run tests in parallel
 pytest tests/ -n auto
@@ -210,7 +210,7 @@ def test_hebbian_learning():
 
 ### 5.1 Documentation Standards
 
-GAIA follows NumPy-style docstrings:
+ORTHOS follows NumPy-style docstrings:
 
 ```python
 def apply_activation(
@@ -259,7 +259,7 @@ mkdocs build
 mkdocs serve
 
 # Generate API documentation
-pdoc --html gaia --output-dir docs/api
+pdoc --html orthos --output-dir docs/api
 ```
 
 ---
@@ -366,7 +366,7 @@ experiments/
 - [ ] Control conditions included
 
 ## Implementation
-- [ ] Code follows GAIA standards
+- [ ] Code follows ORTHOS standards
 - [ ] Reproducibility ensured
 - [ ] Performance metrics defined
 - [ ] Statistical tests implemented
@@ -390,15 +390,15 @@ experiments/
 
 ### 8.1 Learning Resources
 
-- [GAIA Documentation](docs/)
+- [ORTHOS Documentation](docs/)
 - [Coding Standard](CODING_STANDARD.md)
 - [Research Guide](docs/research/)
 - [API Reference](docs/api/)
 
 ### 8.2 Community
 
-- [GitHub Issues](https://github.com/kelaci/gaia/issues)
-- [GitHub Discussions](https://github.com/kelaci/gaia/discussions)
+- [GitHub Issues](https://github.com/kelaci/orthos/issues)
+- [GitHub Discussions](https://github.com/kelaci/orthos/discussions)
 - [Contributor Guide](CONTRIBUTING.md)
 
 ### 8.3 Best Practices
@@ -411,8 +411,8 @@ experiments/
 
 ## 🙏 Thank You!
 
-Your contributions help advance GAIA and the field of adaptive intelligent architectures. We appreciate your time and effort!
+Your contributions help advance ORTHOS and the field of adaptive intelligent architectures. We appreciate your time and effort!
 
-> **Note**: This document is a living guide. As GAIA evolves, so will these contribution guidelines. Your feedback is welcome!
+> **Note**: This document is a living guide. As ORTHOS evolves, so will these contribution guidelines. Your feedback is welcome!
 
-🧠 **Made with care by the GAIA community**
+🧠 **Made with care by the ORTHOS community**

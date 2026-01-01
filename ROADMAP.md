@@ -1,10 +1,12 @@
 # Development Roadmap
 
-## 🗺️ GAIA v4/v4.1 Development Plan
+## 🗺️ ORTHOS v5.0 Development Plan
 
-## 🎯 Current Status: v4.2 - Probabilistic Spine
+## 🎯 Current Status: v5.0 - The Rebranding Release (Completed)
+
 
 ### Completed Features
+- [x] **Major Rebrand from GAIA to ORTHOS**
 - [x] Core architecture with abstract base classes
 - [x] Multiple Hebbian learning rules (STDP, Oja, BCM)
 - [x] Hierarchical processing system with strict management
@@ -15,6 +17,7 @@
 - [x] **Consensus Engine (Hierarchical Aggregation)**
 - [x] Comprehensive documentation and benchmarks
 
+
 ### Current Capabilities
 - Hierarchical processing with temporal abstraction
 - Hebbian learning with multiple rules including STDP
@@ -24,7 +27,8 @@
 - **Bayesian state estimation & multi-level consensus**
 - **Numerically stable high-dimensional filtering**
 
-## 🚀 v4.3 - Structural Plasticity & Advanced Optimization (Next Focus)
+## 🚀 v5.1 - Structural Plasticity & Advanced Optimization (Next Focus)
+
 
 ### Core Objectives
 - **Neuroevolution**: Direct neural architecture evolution
@@ -126,21 +130,24 @@
 
 ## 📋 Version History
 
-### v4.2 (2026-01-01)
-- Probabilistic Spine (Kalman, EKF, Particle Filters)
+### v5.0 (2026-01-01)
+- **Major Rebrand**: GAIA → ORTHOS
+- Integration of Probabilistic Spine (Kalman, EKF, Particle Filters)
 - Consensus Engine & Hierarchical Coordination
 - Joseph Form & Diagonal Covariance Optimizations
 - Top-Down Feedback mechanisms
+- Full documentation overhaul
 
-### v4.3 (Planned 2026-06-30)
+### v5.1 (Planned 2026-06-30)
 - Advanced ES optimization (CMA-ES)
 - Sparse Attention & Structural Plasticity (SAS)
 - Memory systems (Episodic/Long-term)
 
-### v4.3 (Planned 2026-09-30)
+### v5.2 (Planned 2026-09-30)
 - Multi-modal processing
 - RL integration
 - Production deployment tools
+
 
 ## 🎯 Community Goals
 
@@ -167,10 +174,10 @@
 ### Development
 - [Contributing](contributing.md)
 - [Changelog](changelog.md)
-- [Issue Tracker](https://github.com/kelaci/gaia/issues)
+- [Issue Tracker](https://github.com/kelaci/orthos/issues)
 
 ### Community
-- [Discussions](https://github.com/kelaci/gaia/discussions)
+- [Discussions](https://github.com/kelaci/orthos/discussions)
 - [Slack Channel](#)
 - [Mailing List](#)
 
@@ -190,13 +197,13 @@
 - Core architecture
 - Basic plasticity rules
 
-[Unreleased]: https://github.com/kelaci/gaia/compare/v4.1.0...HEAD
-[v4.1]: https://github.com/kelaci/gaia/releases/tag/v4.1.0
-[v4.0]: https://github.com/kelaci/gaia/releases/tag/v4.0
+[Unreleased]: https://github.com/kelaci/orthos/compare/v4.1.0...HEAD
+[v4.1]: https://github.com/kelaci/orthos/releases/tag/v4.1.0
+[v4.0]: https://github.com/kelaci/orthos/releases/tag/v4.0
 
 ## 🎯 Next Steps
 
-The current focus is on **v4.3 - Structural Plasticity & Optimization**, with the following immediate priorities:
+The current focus is on **v5.1 - Structural Plasticity & Optimization**, with the following immediate priorities:
 
 1. **Implement CMA-ES** for robust meta-optimization
 2. **Implement Sparse Attention (SAS)** for efficient scaling
@@ -205,4 +212,5 @@ The current focus is on **v4.3 - Structural Plasticity & Optimization**, with th
 4. **Expand GPU coverage** to remaining components
 5. **Develop Memory Systems** (Long-term/Episodic)
 
-This roadmap provides a clear path for GAIA's continued evolution!
+
+This roadmap provides a clear path for ORTHOS's continued evolution!

@@ -1,8 +1,8 @@
-# Theoretical Foundations of GAIA
+# Theoretical Foundations of ORTHOS
 
 ## 🧠 Overview
 
-GAIA (Generalized Adaptive Intelligent Architecture) is built upon a convergence of computational neuroscience principles, information theory, and modern machine learning techniques. This document provides the scientific foundation underlying GAIA's design.
+ORTHOS (Orthogonal Recursive Hierarchical Optimization System) is built upon a convergence of computational neuroscience principles, information theory, and modern machine learning techniques. This document provides the scientific foundation underlying ORTHOS's design.
 
 ---
 
@@ -10,7 +10,7 @@ GAIA (Generalized Adaptive Intelligent Architecture) is built upon a convergence
 
 ### 1.1 Core Concept
 
-The **Free Energy Principle** (FEP), developed by Karl Friston, proposes that all adaptive systems minimize a quantity called *variational free energy*. In the context of GAIA:
+The **Free Energy Principle** (FEP), developed by Karl Friston, proposes that all adaptive systems minimize a quantity called *variational free energy*. In the context of ORTHOS:
 
 ```
 F = E_q[log q(s) - log p(o,s)]
@@ -23,7 +23,7 @@ Where:
 
 ### 1.2 Expected Free Energy (EFE)
 
-GAIA uses **Expected Free Energy** for action selection:
+ORTHOS uses **Expected Free Energy** for action selection:
 
 ```python
 def approximate_efe(mean: Tensor, std: Tensor) -> Tensor:
@@ -44,7 +44,7 @@ Active Inference is a corollary of FEP where agents:
 1. **Perceive** by updating beliefs to minimize prediction error
 2. **Act** by selecting actions that minimize expected free energy
 
-In GAIA's action selection:
+In ORTHOS's action selection:
 
 ```python
 # Sample actions from policy
@@ -78,9 +78,9 @@ Where:
 - `x_i` = Pre-synaptic activity
 - `y_j` = Post-synaptic activity
 
-### 2.2 GAIA's Plasticity Rules
+### 2.2 ORTHOS's Plasticity Rules
 
-GAIA implements multiple biologically-inspired rules:
+ORTHOS implements multiple biologically-inspired rules:
 
 | Rule | Formula | Purpose |
 |------|---------|---------|
@@ -91,7 +91,7 @@ GAIA implements multiple biologically-inspired rules:
 
 ### 2.3 Dual-Timescale Plasticity
 
-GAIA's innovation: **separate fast and slow traces** mimicking biological memory consolidation:
+ORTHOS's innovation: **separate fast and slow traces** mimicking biological memory consolidation:
 
 ```python
 # Fast trace: rapid adaptation (hippocampus-like)
@@ -113,11 +113,11 @@ slow_trace = slow_trace * τ_slow + η_slow * fast_trace
 
 ### 3.1 Complementary Learning Systems
 
-GAIA's dual-timescale design aligns with the **Complementary Learning Systems** (CLS) theory:
+ORTHOS's dual-timescale design aligns with the **Complementary Learning Systems** (CLS) theory:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    GAIA Memory System                       │
+│                    ORTHOS Memory System                       │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  Fast Trace (τ=0.95)          Slow Trace (τ=0.99)          │
@@ -159,7 +159,7 @@ Hebbian learning is inherently **unstable** — positive feedback can cause unbo
 w → w + η*x*y → larger y → larger Δw → even larger y → explosion
 ```
 
-### 4.2 GAIA's Homeostatic Mechanisms
+### 4.2 ORTHOS's Homeostatic Mechanisms
 
 **Mechanism 1: Trace Normalization**
 ```python
@@ -192,7 +192,7 @@ These mechanisms mirror biological homeostasis:
 
 ### 5.1 BitNet Architecture
 
-GAIA incorporates **1.58-bit quantization** for deployment efficiency:
+ORTHOS incorporates **1.58-bit quantization** for deployment efficiency:
 
 ```python
 def bitnet_quantize(w: Tensor) -> Tensor:
@@ -212,7 +212,7 @@ def bitnet_quantize(w: Tensor) -> Tensor:
 
 ### 5.2 Hybrid Digital-Analog Computing
 
-GAIA's architecture is **hybrid**:
+ORTHOS's architecture is **hybrid**:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -235,9 +235,9 @@ GAIA's architecture is **hybrid**:
 
 ### 6.1 Epistemic vs Aleatoric Uncertainty
 
-GAIA distinguishes two types of uncertainty:
+ORTHOS distinguishes two types of uncertainty:
 
-| Type | Source | Reducible? | GAIA's Measure |
+| Type | Source | Reducible? | ORTHOS's Measure |
 |------|--------|------------|----------------|
 | **Epistemic** | Model uncertainty | Yes (more data) | Ensemble disagreement |
 | **Aleatoric** | Data noise | No | Intrinsic variance |
@@ -322,11 +322,11 @@ The normalization step ensures ||T_fast|| ≤ H immediately after any update whe
 
 ---
 
-*This document provides the theoretical foundation for GAIA's design choices. For implementation details, see [Advanced Plasticity](../architecture/advanced-plasticity.md).*# Research Extensions & Future Directions
+*This document provides the theoretical foundation for ORTHOS's design choices. For implementation details, see [Advanced Plasticity](../architecture/advanced-plasticity.md).*# Research Extensions & Future Directions
 
 ## 🔮 Overview
 
-This document outlines promising research directions for extending GAIA's capabilities. These extensions are grounded in neuroscience literature and aim to enhance the system's learning efficiency, adaptability, and biological plausibility.
+This document outlines promising research directions for extending ORTHOS's capabilities. These extensions are grounded in neuroscience literature and aim to enhance the system's learning efficiency, adaptability, and biological plausibility.
 
 ---
 
@@ -336,9 +336,9 @@ This document outlines promising research directions for extending GAIA's capabi
 
 **Meta-plasticity** is the "plasticity of plasticity" — the ability to dynamically adjust learning rules themselves based on experience.
 
-### 1.2 Current GAIA State
+### 1.2 Current ORTHOS State
 
-GAIA currently uses fixed trace decay rates:
+ORTHOS currently uses fixed trace decay rates:
 ```python
 fast_trace_decay = 0.95  # Fixed
 slow_trace_decay = 0.99  # Fixed
@@ -704,7 +704,7 @@ class TaggingPlasticLinear(DiagnosticPlasticLinear):
 
 **Neuromodulation** refers to the global regulation of neural activity by diffuse neurotransmitter systems (dopamine, serotonin, norepinephrine, acetylcholine).
 
-### 5.2 Current GAIA State
+### 5.2 Current ORTHOS State
 
 Fixed plasticity parameters:
 ```python

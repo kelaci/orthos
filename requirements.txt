@@ -1,4 +1,4 @@
-# GAIA v4/v4.1 Requirements
+# ORTHOS v4/v4.1 Requirements
 
 # Core dependencies
 numpy>=1.20.0

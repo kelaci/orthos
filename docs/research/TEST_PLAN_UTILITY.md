@@ -1,17 +1,17 @@
-# Research Test Plan: Demonstrating Practical & Business Utility of GAIA v4.2
+# Research Test Plan: Demonstrating Practical & Business Utility of ORTHOS v4.2
 
 ## Executive Summary
 
-To bridge the gap between theoretical research and practical application, we define a suite of **High-Value Research Tests**. These tests are designed not just to verify correctness (which unit tests do), but to quantify the **Business and Practical Utility** of GAIA's unique features: the Probabilistic Spine, Sparse Attention, and Meta-Learning.
+To bridge the gap between theoretical research and practical application, we define a suite of **High-Value Research Tests**. These tests are designed not just to verify correctness (which unit tests do), but to quantify the **Business and Practical Utility** of ORTHOS's unique features: the Probabilistic Spine, Sparse Attention, and Meta-Learning.
 
-This plan answers the critical question: *"Why should a business or critical system trust GAIA over a standard Transformer or LSTM?"*
+This plan answers the critical question: *"Why should a business or critical system trust ORTHOS over a standard Transformer or LSTM?"*
 
 ## 1. Robustness & Reliability Benchmark ("The Safety Case")
 
-**Objective:** Prove that GAIA's *Probabilistic Spine* (Kalman/Particle Filters + Consensus) provides superior reliability in noisy, unpredictable environments compared to deterministic baselines.
+**Objective:** Prove that ORTHOS's *Probabilistic Spine* (Kalman/Particle Filters + Consensus) provides superior reliability in noisy, unpredictable environments compared to deterministic baselines.
 
 ### Test Scenario 1.1: Signal-to-Noise Degradation
-* **Setup:** Train/Configure GAIA on clean data (e.g., sine waves, financial time series, robot telemetry).
+* **Setup:** Train/Configure ORTHOS on clean data (e.g., sine waves, financial time series, robot telemetry).
 * **Intervention:** Progressively inject noise (Gaussian, then Non-Gaussian/Heavy-tailed) into the input stream.
 * **Baselines:** Standard LSTM, standard Transformer (without probabilistic filtering).
 * **Metrics:**
@@ -72,6 +72,6 @@ This plan answers the critical question: *"Why should a business or critical sys
 ## 5. Success Criteria (The "Money" Plots)
 
 To declare "Mission Accomplished", we need three key charts:
-1.  **The Shield**: GAIA's error rate remaining flat while Baseline's error spikes as Noise increases.
-2.  **The Scale**: GAIA's memory usage growing linearly (or sub-linearly) while Baseline grows quadratically.
-3.  **The Pivot**: GAIA recovering performance 10x faster than Baseline after a "Regime Shift".
+1.  **The Shield**: ORTHOS's error rate remaining flat while Baseline's error spikes as Noise increases.
+2.  **The Scale**: ORTHOS's memory usage growing linearly (or sub-linearly) while Baseline grows quadratically.
+3.  **The Pivot**: ORTHOS recovering performance 10x faster than Baseline after a "Regime Shift".

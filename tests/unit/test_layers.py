@@ -3,10 +3,10 @@ Unit tests for layers.
 """
 import pytest
 import numpy as np
-from gaia.layers.reactive import ReactiveLayer
-from gaia.layers.hebbian import HebbianCore
-from gaia.layers.temporal import TemporalLayer
-from gaia.core.exceptions import InputShapeError
+from orthos.layers.reactive import ReactiveLayer
+from orthos.layers.hebbian import HebbianCore
+from orthos.layers.temporal import TemporalLayer
+from orthos.core.exceptions import InputShapeError
 
 def test_reactive_layer():
     """Test ReactiveLayer basic functionality."""

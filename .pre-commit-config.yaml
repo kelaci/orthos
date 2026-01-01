@@ -1,4 +1,4 @@
-# GAIA Pre-commit Configuration
+# ORTHOS Pre-commit Configuration
 # Automates code quality checks according to the coding standard
 
 repos:
@@ -136,7 +136,7 @@ repos:
   - repo: local
     hooks:
       - id: check-coding-standard
-        name: Check GAIA Coding Standard
+        name: Check ORTHOS Coding Standard
         entry: python -m scripts.check_coding_standard
         language: system
         types: [python]

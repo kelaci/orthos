@@ -1,13 +1,14 @@
 <p align="center">
-  <h1 align="center">🧠 GAIA</h1>
+  <h1 align="center">🔧 ORTHOS</h1>
   <p align="center">
-    <strong>Generalized Adaptive Intelligent Architecture</strong>
+    <strong>Orthogonal Recursive Hierarchical Optimization System</strong>
   </p>
   <p align="center">
-    A research-grade framework for hierarchical neural architectures with<br/>
-    <em>Hebbian plasticity</em>, <em>Active Inference</em>, and <em>meta-learning</em>
+    A research-grade framework for orthogonal hierarchical processing with<br/>
+    <em>Kalman filtering</em>, <em>Consensus aggregation</em>, and <em>Active Inference</em>
   </p>
 </p>
+
 
 <p align="center">
   <a href="#-quick-start">Quick Start</a> •
@@ -18,28 +19,29 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.2.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-5.0.0-blue.svg" alt="Version">
   <img src="https://img.shields.io/badge/python-3.8+-green.svg" alt="Python">
   <img src="https://img.shields.io/badge/license-MIT-purple.svg" alt="License">
   <img src="https://img.shields.io/badge/status-research--grade-orange.svg" alt="Status">
 </p>
 
+
 ---
 
-## 🌟 What is GAIA?
+## 🌟 What is ORTHOS?
 
-GAIA is an **open-source research project** exploring biologically-inspired neural architectures that can:
+ORTHOS is an **open-source research project** exploring biologically-inspired neural architectures that can:
 
 - **Learn how to learn** through meta-learning of plasticity parameters
 - **Process information hierarchically** at multiple temporal scales
 - **Adapt online** using Hebbian learning rules
 - **Make decisions** using Active Inference and the Free Energy Principle
 
-Whether you're a **neuroscience researcher**, **ML engineer**, or **curious student**, GAIA provides a playground for exploring cutting-edge concepts in adaptive learning systems.
+Whether you're a **neuroscience researcher**, **ML engineer**, or **curious student**, ORTHOS provides a playground for exploring cutting-edge concepts in adaptive learning systems.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     GAIA ARCHITECTURE                           │
+│                     ORTHOS ARCHITECTURE                           │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │   🧠 Consensus Engine (New in v4.2)                             │
@@ -70,24 +72,25 @@ Whether you're a **neuroscience researcher**, **ML engineer**, or **curious stud
 
 ```bash
 # Clone the repository
-git clone https://github.com/kelaci/gaia.git
-cd gaia
+git clone https://github.com/kelaci/orthos.git
+cd orthos
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Run tests to verify installation
-python test_gaia.py
+python test_orthos.py
+
 ```
 
-### Your First GAIA Program
+### Your First ORTHOS Program
 
 ```python
 import numpy as np
-from gaia.layers.hebbian import HebbianCore
-from gaia.hierarchy.manager import HierarchyManager
-from gaia.hierarchy.level import HierarchicalLevel
-from gaia.layers.reactive import ReactiveLayer
+from orthos.layers.hebbian import HebbianCore
+from orthos.hierarchy.manager import HierarchyManager
+from orthos.hierarchy.level import HierarchicalLevel
+from orthos.layers.reactive import ReactiveLayer
 
 # Create a simple 2-level hierarchy
 manager = HierarchyManager()
@@ -159,7 +162,7 @@ print(f"   Level 1: {len(representations[1])} representations")
 
 ### 🛡️ Robustness & Safety (New in v4.2)
 
-GAIA isn't just theory—it's built to survive. We benchmark against critical failure modes:
+ORTHOS isn't just theory—it's built to survive. We benchmark against critical failure modes:
 
 - **Drone Saviour Protocol** 🚁: Prevents crashes during **GPS denial** or **motor failure** by instantly switching to optical flow/IMU fusion via the Probabilistic Spine.
 - **Chaos Resilience**: Maintains stability even when signal-to-noise ratio drops to critical levels.
@@ -194,14 +197,15 @@ scipy>=1.7.0           # Scientific computing
 
 ```bash
 # Clone with full history
-git clone https://github.com/kelaci/gaia.git
-cd gaia
+git clone https://github.com/kelaci/orthos.git
+cd orthos
 
 # Install all dependencies (including dev tools)
 pip install -r requirements.txt
 
 # Verify installation
-python test_gaia.py
+python test_orthos.py
+
 ```
 
 ### Optional: PyTorch Support
@@ -224,8 +228,9 @@ The documentation has been consolidated for efficiency:
 | [🔬 SCIENCE.md](SCIENCE.md) | Theoretical foundations, Active Inference, and research directions |
 | [📘 GUIDES.md](GUIDES.md) | Quickstart, GPU usage, validation, and PyTorch integration |
 | [🗺️ ROADMAP.md](ROADMAP.md) | Development roadmap and version milestones |
-| [📐 GAIA_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md](GAIA_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md) | **Comprehensive mathematical foundations with practical examples and GAIA advantages** |
+| [📐 ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md](ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md) | **Comprehensive mathematical foundations with practical examples and ORTHOS advantages** |
 | [🤖 .agent/docs/README.md](.agent/docs/README.md) | **Onboarding & SOPs for AI Agents** |
+
 
 ---
 
@@ -243,7 +248,7 @@ This repository is **Agent-Ready**. If you are an AI agent:
 
 > "Neurons that fire together, wire together" — Donald Hebb (1949)
 
-Hebbian learning is a biologically-inspired learning rule where connection strengths increase when neurons are simultaneously active. GAIA implements multiple variants:
+Hebbian learning is a biologically-inspired learning rule where connection strengths increase when neurons are simultaneously active. ORTHOS implements multiple variants:
 
 ```python
 # Classic Hebbian
@@ -263,7 +268,7 @@ Hebbian learning is a biologically-inspired learning rule where connection stren
 
 The Free Energy Principle (FEP), developed by Karl Friston, proposes that adaptive systems minimize "free energy" — a measure of surprise or prediction error.
 
-GAIA uses **Expected Free Energy (EFE)** for action selection:
+ORTHOS uses **Expected Free Energy (EFE)** for action selection:
 - **Pragmatic value**: How well does action achieve goals?
 - **Epistemic value**: How much information does action provide?
 
@@ -278,12 +283,12 @@ EFE = pragmatic_value - exploration_weight * epistemic_uncertainty
 
 Meta-learning is "learning to learn" — optimizing the learning process itself.
 
-GAIA uses **Evolutionary Strategies (ES)** to optimize plasticity parameters:
+ORTHOS uses **Evolutionary Strategies (ES)** to optimize plasticity parameters:
 1. Generate population of parameter variations
 2. Evaluate each variation on tasks
 3. Update parameters toward best performers
 
-This allows GAIA to discover optimal learning rates, decay rates, and other hyperparameters automatically.
+This allows ORTHOS to discover optimal learning rates, decay rates, and other hyperparameters automatically.
 
 </details>
 
@@ -292,13 +297,14 @@ This allows GAIA to discover optimal learning rates, decay rates, and other hype
 ## 🗂️ Project Structure
 
 ```
-gaia/
+orthos/
 ├── 📄 README.md                 ← You are here
 ├── 📄 LICENSE                   ← MIT License
 ├── 📄 requirements.txt          ← Dependencies
-├── 📄 test_gaia.py              ← Test suite
+├── 📄 test_orthos.py            ← Test suite
 │
-├── 📁 gaia/                     ← Main package
+├── 📁 orthos/                     ← Main package
+
 │   ├── core/                    ← Base classes & types
 │   │   ├── base.py              ← Abstract base classes
 │   │   ├── tensor.py            ← Tensor operations
@@ -361,10 +367,11 @@ gaia/
 
 ```bash
 # Run all tests
-python test_gaia.py
+python test_orthos.py
 
 # Expected output:
-# 🚀 Running GAIA v4.2.0 Tests
+# 🚀 Running ORTHOS v5.0.0 Tests
+
 # ==================================================
 # 🧪 Testing Layers...
 # ✅ ReactiveLayer test passed
@@ -401,8 +408,8 @@ We welcome contributions from researchers, engineers, and enthusiasts!
 
 | Contribution | Description |
 |--------------|-------------|
-| 🐛 **Bug Reports** | Found a bug? [Open an issue](https://github.com/kelaci/gaia/issues) |
-| 💡 **Feature Requests** | Have an idea? Share it in [Discussions](https://github.com/kelaci/gaia/discussions) |
+| 🐛 **Bug Reports** | Found a bug? [Open an issue](https://github.com/kelaci/orthos/issues) |
+| 💡 **Feature Requests** | Have an idea? Share it in [Discussions](https://github.com/kelaci/orthos/discussions) |
 | 📝 **Documentation** | Improve docs, fix typos, add examples |
 | 🧪 **Tests** | Add test coverage, edge cases |
 | 🔬 **Research** | Implement new plasticity rules, architectures |
@@ -411,7 +418,7 @@ We welcome contributions from researchers, engineers, and enthusiasts!
 
 1. **Fork the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/gaia.git
+   git clone https://github.com/YOUR_USERNAME/orthos.git
    ```
 
 2. **Create a feature branch**
@@ -427,7 +434,8 @@ We welcome contributions from researchers, engineers, and enthusiasts!
 
 4. **Run tests**
    ```bash
-   python test_gaia.py
+   python test_orthos.py
+
    ```
 
 5. **Submit a pull request**
@@ -459,7 +467,7 @@ def example_function(input_data: np.ndarray, learning_rate: float = 0.01) -> np.
 
 ## 📚 Research Background
 
-GAIA is built on foundational work from neuroscience and machine learning:
+ORTHOS is built on foundational work from neuroscience and machine learning:
 
 ### Key References
 
@@ -483,8 +491,9 @@ GAIA is built on foundational work from neuroscience and machine learning:
 
 ## 🗺️ Roadmap
 
-### Current: v4.2.0 ✅
+### Current: v5.0.0 (Rebrand) ✅
 
+- [x] **Major Rebrand from GAIA to ORTHOS**
 - [x] **Probabilistic Spine Integration**
   - [x] Standard & Extended Kalman Filters
   - [x] Particle Filters (SMC)
@@ -496,12 +505,13 @@ GAIA is built on foundational work from neuroscience and machine learning:
 - [x] Meta-learning framework
 - [x] Comprehensive documentation
 
-### Coming: v4.3.0 🚧
+### Coming: v5.1.0 🚧
 
 - [ ] Advanced ES variants (CMA-ES, NES)
 - [ ] Attention mechanisms for hierarchy
 - [ ] Multi-objective optimization
 - [ ] GPU acceleration improvements
+
 
 ### Future: v4.4.0+
 
@@ -517,16 +527,16 @@ See [Development Roadmap](ROADMAP.md) for details.
 ## ❓ FAQ
 
 <details>
-<summary><strong>Is GAIA suitable for production use?</strong></summary>
+<summary><strong>Is ORTHOS suitable for production use?</strong></summary>
 
-GAIA is a **research project** focused on exploring novel learning architectures. While the code is well-tested and stable, it's designed for research and experimentation rather than production deployment. That said, the modular architecture makes it easy to extract and use specific components.
+ORTHOS is a **research project** focused on exploring novel learning architectures. While the code is well-tested and stable, it's designed for research and experimentation rather than production deployment. That said, the modular architecture makes it easy to extract and use specific components.
 
 </details>
 
 <details>
-<summary><strong>How does GAIA compare to traditional neural networks?</strong></summary>
+<summary><strong>How does ORTHOS compare to traditional neural networks?</strong></summary>
 
-| Aspect | Traditional NN | GAIA |
+| Aspect | Traditional NN | ORTHOS |
 |--------|----------------|------|
 | Learning | Backpropagation | Hebbian + ES |
 | Adaptation | Offline training | Online learning |
@@ -536,9 +546,9 @@ GAIA is a **research project** focused on exploring novel learning architectures
 </details>
 
 <details>
-<summary><strong>Can I use GAIA with PyTorch/TensorFlow?</strong></summary>
+<summary><strong>Can I use ORTHOS with PyTorch/TensorFlow?</strong></summary>
 
-Yes! GAIA has two implementations:
+Yes! ORTHOS has two implementations:
 - **NumPy v4.x**: Pure NumPy for research/prototyping
 - **PyTorch v3.1**: GPU-accelerated for training
 
@@ -566,7 +576,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ```
 MIT License
 
-Copyright (c) 2025 GAIA Development Team
+Copyright (c) 2025 ORTHOS Development Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -587,14 +597,14 @@ copies of the Software...
 
 ## 📬 Contact
 
-- **GitHub Issues**: [Bug reports & feature requests](https://github.com/kelaci/gaia/issues)
-- **GitHub Discussions**: [Questions & ideas](https://github.com/kelaci/gaia/discussions)
-- **Repository**: [github.com/kelaci/gaia](https://github.com/kelaci/gaia)
+- **GitHub Issues**: [Bug reports & feature requests](https://github.com/kelaci/orthos/issues)
+- **GitHub Discussions**: [Questions & ideas](https://github.com/kelaci/orthos/discussions)
+- **Repository**: [github.com/kelaci/orthos](https://github.com/kelaci/orthos)
 
 ---
 
 <p align="center">
-  <strong>⭐ Star us on GitHub if you find GAIA interesting! ⭐</strong>
+  <strong>⭐ Star us on GitHub if you find ORTHOS interesting! ⭐</strong>
 </p>
 
 <p align="center">

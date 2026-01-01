@@ -8,12 +8,12 @@ from dataclasses import dataclass
 from typing import List, Dict, Optional
 import matplotlib.pyplot as plt
 
-# GAIA Imports
-from gaia.hierarchy.manager import HierarchyManager
-from gaia.hierarchy.level import HierarchicalLevel
-from gaia.layers.reactive import ReactiveLayer
+# ORTHOS Imports
+from orthos.hierarchy.manager import HierarchyManager
+from orthos.hierarchy.level import HierarchicalLevel
+from orthos.layers.reactive import ReactiveLayer
 # Assuming Kalman/Probabilistic exists in v4.2 based on prompt context
-# from gaia.filters.kalman import KalmanFilter # Example import
+# from orthos.filters.kalman import KalmanFilter # Example import
 
 @dataclass
 class BenchmarkResult:
@@ -26,7 +26,7 @@ class BenchmarkResult:
 
 class UtilityBenchmark:
     """
-    Orchestrates the 'Practical & Business Utility' benchmarks for GAIA.
+    Orchestrates the 'Practical & Business Utility' benchmarks for ORTHOS.
     """
     
     def __init__(self):
@@ -34,7 +34,7 @@ class UtilityBenchmark:
         self.manager = self._setup_gaia_system()
         
     def _setup_gaia_system(self) -> HierarchyManager:
-        """Initializes a standard GAIA hierarchy for testing."""
+        """Initializes a standard ORTHOS hierarchy for testing."""
         manager = HierarchyManager()
         # Level 0: Fast Reactive
         l0 = HierarchicalLevel(0, input_size=10, output_size=16, temporal_resolution=1)
@@ -58,7 +58,7 @@ class UtilityBenchmark:
             noise = np.random.normal(0, sigma, base_signal.shape)
             noisy_signal = base_signal + noise
             
-            # 2. Run GAIA
+            # 2. Run ORTHOS
             # start_time = time.time()
             # output = self.manager.process_hierarchy(noisy_signal)
             
@@ -70,7 +70,7 @@ class UtilityBenchmark:
             mse = 0.01 * (sigma + 0.1) # Mock result
             
             self.results.append(BenchmarkResult(
-                name="GAIA v4.2",
+                name="ORTHOS v4.2",
                 scenario=f"Noise_Sigma_{sigma}",
                 metric="MSE",
                 value=mse,
@@ -96,7 +96,7 @@ class UtilityBenchmark:
             throughput = seq_len / duration
             
             self.results.append(BenchmarkResult(
-                name="GAIA v4.2",
+                name="ORTHOS v4.2",
                 scenario=f"Seq_Len_{seq_len}",
                 metric="Throughput",
                 value=throughput,
@@ -118,16 +118,16 @@ class UtilityBenchmark:
             # 1. Simulate stable flight
             # 2. Inject Failure (e.g., set GPS_noise = infinity)
             
-            # 3. Simulate GAIA response (Mock)
-            # In real impl, GAIA's Precision estimates would shift weights automatically
+            # 3. Simulate ORTHOS response (Mock)
+            # In real impl, ORTHOS's Precision estimates would shift weights automatically
             
-            reaction_time = 0.05 # 50ms (Hypothetical GAIA response)
+            reaction_time = 0.05 # 50ms (Hypothetical ORTHOS response)
             drift = 0.2 if "GPS_LOSS" in mode else 1.5 # meters
             
             outcome = "STABLE" if drift < 1.0 else "CRASH"
             
             self.results.append(BenchmarkResult(
-                name="GAIA v4.2 (DroneMode)",
+                name="ORTHOS v4.2 (DroneMode)",
                 scenario=f"Failure_{mode}",
                 metric="Drift_Distance",
                 value=drift,
@@ -136,7 +136,7 @@ class UtilityBenchmark:
             ))
 
     def print_report(self):
-        print("\n=== GAIA RESEARCH UTILITY REPORT ===")
+        print("\n=== ORTHOS RESEARCH UTILITY REPORT ===")
         print(f"{'SCENARIO':<25} | {'METRIC':<15} | {'VALUE':<10} | {'UNITS'}")
         print("-" * 65)
         for r in self.results:

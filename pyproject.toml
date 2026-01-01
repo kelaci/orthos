@@ -3,12 +3,12 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "gaia-framework"
-version = "4.1.0"
-description = "Generalized Adaptive Intelligent Architecture"
+name = "orthos-framework"
+version = "5.0.0"
+description = "Orthogonal Recursive Hierarchical Optimization System"
 readme = "README.md"
 authors = [
-  { name = "GAIA Development Team", email = "dev@gaia.ai" },
+  { name = "ORTHOS Development Team", email = "dev@orthos.ai" },
 ]
 license = { file = "LICENSE" }
 classifiers = [
@@ -18,7 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-keywords = ["neuroscience", "hebbian-learning", "active-inference", "meta-learning"]
+keywords = ["neuroscience", "kalman-filter", "hierarchical-learning", "active-inference", "orthogonal-processing"]
 dependencies = [
     "numpy>=1.20.0",
     "matplotlib>=3.4.0",
@@ -40,8 +40,9 @@ torch = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/kelaci/gaia"
-"Bug Tracker" = "https://github.com/kelaci/gaia/issues"
+"Homepage" = "https://github.com/kelaci/orthos"
+"Bug Tracker" = "https://github.com/kelaci/orthos/issues"
 
 [tool.setuptools]
-packages = ["gaia"]
+packages = ["orthos"]
+
