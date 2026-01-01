@@ -6,12 +6,12 @@ Hebbian learning layer with multiple plasticity rules for adaptive feature learn
 
 import numpy as np
 from typing import Dict, Optional, List, Tuple, Any
-from gaia.core.base import PlasticComponent
+from gaia.core.base import Layer, PlasticComponent
 from gaia.core.types import Tensor, PlasticityParams
 from gaia.core.tensor import initialize_weights
 from gaia.core.gpu_utils import get_array_module
 
-class HebbianCore(PlasticComponent):
+class HebbianCore(Layer, PlasticComponent):
     """
     Hebbian learning implementation with multiple plasticity rules.
 
@@ -172,6 +172,36 @@ class HebbianCore(PlasticComponent):
         # 2. Weight normalization (L2 norm per neuron)
         norm = xp.linalg.norm(self.weights, axis=1, keepdims=True)
         self.weights = self.weights / (norm + 1e-8)
+
+    def activation(self, x: Tensor) -> Tensor:
+        """
+        Apply activation function (identity for HebbianCore).
+
+        Args:
+            x: Input tensor
+
+        Returns:
+            Output tensor (unchanged)
+        """
+        return x
+
+    def get_weights(self) -> Tensor:
+        """
+        Get current weight matrix.
+
+        Returns:
+            Weight matrix
+        """
+        return self.weights
+
+    def set_weights(self, weights: Tensor) -> None:
+        """
+        Set weight matrix.
+
+        Args:
+            weights: New weight matrix
+        """
+        self.weights = weights
 
     def reset_state(self) -> None:
         """Reset internal state."""
