@@ -37,6 +37,9 @@ ORTHOS (Orthogonal Recursive Hierarchical Optimization System) is a biologically
 │   8. Dynamic Modulation (Contextual Control)                   │
 │      └─ Regime-aware noise adaptation                          │
 │                                                                 │
+│   9. Orthos Cayley Layer (Rigid Dynamics)                      │
+│      └─ Implicit Orthogonality via S-Symmetry                  │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -2023,3 +2026,57 @@ The system's strength lies in its modular architecture and biological inspiratio
 **Version**: ORTHOS v5.0 (The Architecture Candidate)  
 **Date**: 2026-01-01  
 **Status**: Complete ✅
+
+---
+
+## 14. ORTHOS CAYLEY LAYER - Implicit Orthogonality (v5.1)
+
+### 🎯 Overview
+
+The **Orthos Cayley Layer** is a specialized weight layer that guarantees orthogonality ($W W^T = I$) without the need for expensive explicit projection or Gram-Schmidt normalization. It uses **Implicit Parameterization** via the Cayley Transform, making it ideal for maintaining stable hidden dynamics and preventing gradient explosion/vanishing.
+
+### 📐 1. Skew-Symmetric Parameterization
+
+Instead of learning the weight matrix $W$ directly, we learn a **Skew-Symmetric** matrix $S$. A matrix is skew-symmetric if:
+$$ S^T = -S $$
+
+In ORTHOS, we enforce this by taking an unconstrained parameter matrix $A$ and computing:
+$$ S = A - A^T $$
+
+**Significance:** This reduction in degrees of freedom (from $N^2$ to $N(N-1)/2$) ensures the parameters always stay on a manifold that can be transformed into the Orthogonal Group.
+
+### 📐 2. The Cayley Transform
+
+The bridge between skew-symmetric matrices and orthogonal matrices is the **Cayley Transform**:
+$$ W = (I - S)(I + S)^{-1} $$
+
+**Key Properties:**
+- If $S$ is skew-symmetric, then $W$ is **Orthogonal** ($W^T W = I$).
+- **Volume Preservation**: The transform produces a matrix where $\det(W) = 1$, meaning it belongs to the **Special Orthogonal Group SO(n)**. It preserves the L2 norm of the input and the volume of the state space, ensuring that signal energy is neither amplified nor destroyed during processing.
+
+### 📐 3. Rectified Orthogonality (Non-Square Matrices)
+
+While the Cayley transform is naturally defined for square matrices, ORTHOS v5.1 supports **Rectified Orthogonality** for rectangular layers ($M \times N$).
+
+**The Process:**
+1.  Define a square skew-symmetric kernel of size $K = \max(M, N)$.
+2.  Compute the square orthogonal matrix $W_{square}$ ($K \times K$).
+3.  **Truncate/Rectify**: Extract the sub-matrix of size $M \times N$.
+
+**Result:** This produces a semi-orthogonal matrix where the rows (or columns) are orthonormal, maintaining the "near-isometric" properties required for stability even in dimension-changing layers.
+
+### 🧬 Implementation Logic
+
+```python
+# 1. Enforce Skew-Symmetry
+S = params - params.T
+
+# 2. Cayley Transform (Implicit Orthogonality)
+I = np.eye(max_dim)
+W_square = np.linalg.solve(I + S, I - S)
+
+# 3. Rectify for Non-Square (M x N)
+weight = W_square[:M, :N]
+```
+
+**Practical Advantage:** This layer is essential for the **Probabilistic Spine** in Level 3, where keeping the Kalman Filter's state transition matrix stable is critical for long-term convergence. It prevents the covariance from shrinking to zero or exploding.
