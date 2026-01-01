@@ -49,6 +49,7 @@ class ConsensusHierarchyManager(HierarchyManager):
         self.consensus_history: List[ConsensusResult] = []
         self.auto_projection = auto_projection
         self.consensus_prior: Optional[np.ndarray] = None
+        self.global_concept: str = "stable"
 
     def _validate_dimensions(self, level_predictions: List[LevelPrediction]) -> Tuple[int, bool]:
         """
@@ -172,16 +173,47 @@ class ConsensusHierarchyManager(HierarchyManager):
             for pred in level_predictions:
                 pred.prediction = self._project_prediction(pred.prediction, target_dim)
 
-        # Aggregate using consensus engine
+        # 1. Update global concept state
+        self.global_concept = self._detect_global_concept()
+
+        # 2. Distribute concept to levels if they support it
+        for level_obj in self.levels:
+            if hasattr(level_obj, 'set_concept_state'):
+                level_obj.set_concept_state(self.global_concept)
+
+        # 3. Aggregate using consensus engine
         result = self.consensus_engine.aggregate(level_predictions, method=method) # type: ignore
         
-        # Store as prior for next iteration (top-down feedback)
+        # 4. Store as prior for next iteration (top-down feedback)
         self.consensus_prior = result.prediction
         
         self.consensus_history.append(result)
         self.global_time_step += 1
 
         return result
+
+    def _detect_global_concept(self) -> str:
+        """
+        Analyze consensus history to identify the global state/regime.
+        
+        Returns:
+            "stable", "transition", or "storm".
+        """
+        if len(self.consensus_history) < 5:
+            return "stable"
+        
+        recent_agreement = [r.agreement_score for r in self.consensus_history[-5:]]
+        mean_agreement = float(np.mean(recent_agreement))
+        
+        # Trend detection
+        agreement_trend = recent_agreement[-1] - recent_agreement[0]
+        
+        if mean_agreement < self.consensus_engine.min_agreement:
+            return "storm"
+        elif agreement_trend < -0.2:
+            return "transition"
+        else:
+            return "stable"
 
     def distribute_prior(self, levels: List[HierarchicalLevel]) -> None:
         """

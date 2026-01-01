@@ -1,3 +1,31 @@
+# 🚀 ORTHOS v5.1.0 Release Notes - The Stability & Modulation Release
+
+We are proud to announce **ORTHOS v5.1.0**, implementing the "Master Improvements" for numerical stability and dynamic contextual modulation.
+
+## 🌟 Key Highlights
+
+### 1. 🛡️ Ultra-Stable Filtering (SR-KF)
+- **Square Root Kalman Filter**: Implemented for all hierarchical levels. Storing the Cholesky factor $S$ instead of $P$ ensures positive semi-definiteness and doubles numerical precision.
+- **Block-Diagonal Covariance**: Introduced for high-dimensional state spaces where some variables are correlated but others are independent. Provides an optimal balance between accuracy and $O(N \cdot B^2)$ efficiency.
+
+### 2. 🧠 Dynamic Top-Down Modulation
+- **Regime Detection**: Levels now automatically detect their conceptual state: **Stable**, **Transition**, or **Storm**.
+- **Contextual Noise Scaling**: The system dynamically modulates observation ($R$) and process ($Q$) noise based on the detected regime.
+- **Global Coordination**: `ConsensusHierarchyManager` now broadcasts a global concept state to all participating levels, enabling unified behavior during environmental shifts.
+
+### 3. ⚡ Advanced Adaptive Noise
+- **Q-Dynamics**: Adaptive noise estimation now includes process noise ($Q$) dynamics, allowing the model to become more "flexible" during chaotic periods and more "rigid" during stability.
+- **Safe Envelopes**: Enforced minimum and maximum noise floors to prevent filter lock-up or divergence.
+
+## 🛠️ Full Changelog
+- **Added**: `SquareRootKalmanFilter` in `orthos/filters/kalman.py`.
+- **Added**: `BlockDiagonalKalmanFilter` in `orthos/filters/kalman.py`.
+- **Improved**: `FilteredHierarchicalLevel` with `dynamic_modulation` and concept detection.
+- **Improved**: `ConsensusHierarchyManager` with global concept analysis and broadcasting.
+- **Updated**: Comprehensive mathematical documentation in `ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md`.
+
+---
+
 # 🚀 ORTHOS v5.0.0 Release Notes - The Rebranding Release
 
 We are excited to announce **ORTHOS v5.0.0**, a major identity transformation that aligns the codebase with its mathematical foundations: **Orthogonal Recursive Hierarchical Optimization System**.

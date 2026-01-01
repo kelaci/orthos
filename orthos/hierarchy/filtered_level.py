@@ -9,7 +9,7 @@ import numpy as np
 from typing import Tuple, Optional, Literal, Dict, Any, Union, List
 
 from orthos.hierarchy.level import HierarchicalLevel
-from orthos.filters.kalman import KalmanFilter, ExtendedKalmanFilter
+from orthos.filters.kalman import KalmanFilter, ExtendedKalmanFilter, SquareRootKalmanFilter, BlockDiagonalKalmanFilter
 from orthos.filters.particle import ParticleFilter
 
 
@@ -33,14 +33,15 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
         input_size: int,
         output_size: int,
         temporal_resolution: int = 1,
-        filter_type: Literal['kalman', 'ekf', 'particle', 'none'] = 'kalman',
+        filter_type: Literal['kalman', 'sr_kalman', 'block_diagonal', 'ekf', 'particle', 'none'] = 'kalman',
         process_noise: float = 0.01,
         obs_noise: float = 0.1,
         adaptive_noise: bool = False,
-        use_diagonal_covariance: bool = None,
+        use_diagonal_covariance: Optional[bool] = None,
         min_obs_noise: float = 1e-6,
         use_joseph_form: bool = False,
         top_down_weight: float = 0.5,
+        dynamic_modulation: bool = True,
         **kwargs: Any
     ):
         """
@@ -68,33 +69,43 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
         self.top_down_weight = top_down_weight
         self._top_down_prior: Optional[np.ndarray] = None
 
-        # Initialize Filter based on type
-        if filter_type == 'kalman':
-            self.filter = KalmanFilter(
-                state_dim=output_size,
-                obs_dim=output_size,
-                process_noise=process_noise,
-                obs_noise=obs_noise,
-                adaptive=adaptive_noise,
-                use_diagonal_covariance=use_diagonal_covariance,
-                min_obs_noise=min_obs_noise,
-                use_joseph_form=use_joseph_form
-            )
-        elif filter_type == 'ekf':
-            self.filter = ExtendedKalmanFilter(
-                state_dim=output_size,
-                obs_dim=output_size,
-                dynamics_fn=lambda x, u: x,  # Default to Random Walk
+        # Initialize Filter using dispatch table (Standard 2.6.1)
+        filter_params = dict(
+            state_dim=output_size,
+            obs_dim=output_size,
+            process_noise=process_noise,
+            obs_noise=obs_noise,
+            adaptive=adaptive_noise,
+            use_diagonal_covariance=use_diagonal_covariance,
+            min_obs_noise=min_obs_noise,
+            use_joseph_form=use_joseph_form
+        )
+        
+        self.filter = self._init_filter(filter_type, output_size, obs_noise, filter_params)
+        
+        self.dynamic_modulation = dynamic_modulation
+        self.uncertainty_history: List[float] = []
+        self.state_history: List[np.ndarray] = []
+        self._current_concept: Optional[str] = None
+
+    def _init_filter(
+        self, 
+        filter_type: str, 
+        output_size: int, 
+        obs_noise: float, 
+        filter_params: Dict[str, Any]
+    ) -> Optional[Union[KalmanFilter, ParticleFilter]]:
+        """Initialize appropriate filter using a dispatch map."""
+        
+        def init_ekf():
+            return ExtendedKalmanFilter(
+                dynamics_fn=lambda x, u: x,
                 observation_fn=lambda x: x,
-                process_noise=process_noise,
-                obs_noise=obs_noise,
-                adaptive=adaptive_noise,
-                use_diagonal_covariance=use_diagonal_covariance,
-                min_obs_noise=min_obs_noise,
-                use_joseph_form=use_joseph_form
+                **filter_params
             )
-        elif filter_type == 'particle':
-            self.filter = ParticleFilter(
+            
+        def init_particle():
+            return ParticleFilter(
                 n_particles=500,
                 state_dim=output_size,
                 dynamics_fn=lambda x, u, n: x + n,
@@ -103,7 +114,35 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
                 )
             )
 
-        self.uncertainty_history: List[float] = []
+        dispatch = {
+            'kalman': lambda: KalmanFilter(**filter_params),
+            'sr_kalman': lambda: SquareRootKalmanFilter(**filter_params),
+            'block_diagonal': lambda: BlockDiagonalKalmanFilter(**filter_params),
+            'ekf': init_ekf,
+            'particle': init_particle,
+            'none': lambda: None
+        }
+        
+        return dispatch.get(filter_type, lambda: None)()
+
+    def process_time_step(
+        self, 
+        input_data: np.ndarray, 
+        t: int
+    ) -> np.ndarray:
+        """
+        Polymorphic interface for hierarchical processing.
+        
+        Args:
+            input_data: Current input features.
+            t: Current time step.
+            
+        Returns:
+            Processed and filtered representation.
+        """
+        # forward_filtered handles the neural pass and the filtering
+        prediction, _ = self.forward_filtered(input_data)
+        return prediction
 
     def set_top_down_prior(self, prior: np.ndarray) -> None:
         """
@@ -113,6 +152,15 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
             prior: Prior vector from higher levels.
         """
         self._top_down_prior = prior
+
+    def set_concept_state(self, concept: str) -> None:
+        """
+        Set the conceptual state (overrides local detection).
+        
+        Args:
+            concept: "stable", "transition", or "storm".
+        """
+        self._current_concept = concept
 
     def forward_filtered(
         self,
@@ -165,7 +213,20 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
             return raw_output, 0.0
 
         # 2. Filtering cycle with Bayesian fusion
-        if isinstance(self.filter, KalmanFilter):
+        if self.filter is not None and not isinstance(self.filter, ParticleFilter):
+            # Dynamic Modulation based on concept state
+            if self.dynamic_modulation:
+                concept = self._detect_concept_state()
+                if concept == "storm":
+                    # Increase R (trust sensors less during "storm"/chaos)
+                    self.filter.R *= 1.5
+                elif concept == "stable":
+                    # Decrease R (trust sensors more during stability)
+                    self.filter.R *= 0.95
+                
+                # Reset externally set concept to allow fresh detection if not updated
+                self._current_concept = None
+                
             # Identity transition assumed for random walk
             self.filter.predict(F=np.eye(self.output_size))
             
@@ -236,7 +297,40 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
             uncertainty = 0.0
 
         self.uncertainty_history.append(uncertainty)
+        self.state_history.append(prediction)
         return prediction, uncertainty
+
+    def _detect_concept_state(self) -> str:
+        """
+        Analyze current state history to detect conceptual regime.
+        
+        Returns:
+            "stable", "transition", or "storm".
+        """
+        # Return externally set concept if available
+        if self._current_concept is not None:
+            return self._current_concept
+
+        if len(self.state_history) < 5:
+            return "stable"
+        
+        # Recent volatility
+        recent_states = np.array(self.state_history[-5:])
+        diffs = np.diff(recent_states, axis=0)
+        volatility = np.mean(np.linalg.norm(diffs, axis=1))
+        
+        # Recent uncertainty trend
+        if len(self.uncertainty_history) >= 2:
+            unc_trend = self.uncertainty_history[-1] - self.uncertainty_history[-2]
+        else:
+            unc_trend = 0
+            
+        if volatility > 0.5 or unc_trend > 0.1:
+            return "storm"
+        elif volatility > 0.2:
+            return "transition"
+        else:
+            return "stable"
 
     def get_confidence(self) -> float:
         """
