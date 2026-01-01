@@ -2,7 +2,7 @@
 
 ## 🗺️ GAIA v4/v4.1 Development Plan
 
-## 🎯 Current Status: v4.1 - Meta-Learning of Plasticity
+## 🎯 Current Status: v4.2 - Probabilistic Spine
 
 ### Completed Features
 - [x] Core architecture with abstract base classes
@@ -11,6 +11,8 @@
 - [x] Evolutionary Strategy optimization with Hill Climbing
 - [x] Meta-learning framework with early stopping
 - [x] GPU Acceleration with CuPy (Hybrid System)
+- [x] **Probabilistic Spine (Kalman/Particle Filters)**
+- [x] **Consensus Engine (Hierarchical Aggregation)**
 - [x] Comprehensive documentation and benchmarks
 
 ### Current Capabilities
@@ -19,8 +21,10 @@
 - Evolutionary Strategy for plasticity control
 - Robust meta-learning with convergence checks
 - Automatic GPU/CPU dispatch
+- **Bayesian state estimation & multi-level consensus**
+- **Numerically stable high-dimensional filtering**
 
-## 🚀 v4.2 - Advanced Features (Next Focus)
+## 🚀 v4.3 - Structural Plasticity & Advanced Optimization (Next Focus)
 
 ### Core Objectives
 - **Neuroevolution**: Direct neural architecture evolution
@@ -122,24 +126,16 @@
 
 ## 📋 Version History
 
-### v4.1 (2025-12-24)
-- Meta-learning of plasticity (Hill Climbing, Early Stopping)
-- STDP learning rule realization
-- GPU acceleration via CuPy
-- Hierarchy management improvements
-- Full benchmarking suite
+### v4.2 (2026-01-01)
+- Probabilistic Spine (Kalman, EKF, Particle Filters)
+- Consensus Engine & Hierarchical Coordination
+- Joseph Form & Diagonal Covariance Optimizations
+- Top-Down Feedback mechanisms
 
-### v4.0 (2025-12-01)
-- Initial core architecture
-- Basic layer implementations
-- Hierarchy system
-- Plasticity controller
-- Documentation framework
-
-### v4.2 (Planned 2026-03-31)
+### v4.3 (Planned 2026-06-30)
 - Advanced ES optimization (CMA-ES)
-- Neuroevolution features
-- Memory systems
+- Sparse Attention & Structural Plasticity (SAS)
+- Memory systems (Episodic/Long-term)
 
 ### v4.3 (Planned 2026-09-30)
 - Multi-modal processing
@@ -200,10 +196,11 @@
 
 ## 🎯 Next Steps
 
-The current focus is on **v4.2 - Advanced Features**, with the following immediate priorities:
+The current focus is on **v4.3 - Structural Plasticity & Optimization**, with the following immediate priorities:
 
 1. **Implement CMA-ES** for robust meta-optimization
-2. **Design Neuroevolution** prototypes for architecture search
+2. **Implement Sparse Attention (SAS)** for efficient scaling
+3. **Design Neuroevolution** prototypes for architecture search
 3. **Integrate Multi-modal** processing interfaces
 4. **Expand GPU coverage** to remaining components
 5. **Develop Memory Systems** (Long-term/Episodic)

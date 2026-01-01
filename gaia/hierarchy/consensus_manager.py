@@ -66,8 +66,14 @@ class ConsensusHierarchyManager(HierarchyManager):
         if not level_predictions:
             raise ValueError("No level predictions provided")
 
-        dimensions = [pred.prediction.shape[0] if pred.prediction.ndim > 0 else len(pred.prediction) 
-                     for pred in level_predictions]
+        dimensions = []
+        for pred in level_predictions:
+            pred_array = np.asarray(pred.prediction)
+            if pred_array.ndim == 0:
+                dimensions.append(1)  # Scalar treated as 1-dimensional
+            else:
+                dimensions.append(pred_array.shape[0])
+        
         unique_dims = set(dimensions)
 
         if len(unique_dims) == 1:
@@ -97,22 +103,26 @@ class ConsensusHierarchyManager(HierarchyManager):
         Returns:
             Projected prediction vector.
         """
-        current_dim = prediction.shape[0] if prediction.ndim > 0 else len(prediction)
+        pred_array = np.asarray(prediction)
+        if pred_array.ndim == 0:
+            pred_array = pred_array.reshape(1)
+        
+        current_dim = pred_array.shape[0]
         
         if current_dim == target_dim:
-            return prediction
+            return pred_array
         elif current_dim < target_dim:
             # Upsample with repetition (simple but effective for many cases)
             repetition = target_dim // current_dim
             remainder = target_dim % current_dim
-            projected = np.tile(prediction, repetition)
+            projected = np.tile(pred_array, repetition)
             if remainder > 0:
-                projected = np.concatenate([projected, prediction[:remainder]])
+                projected = np.concatenate([projected, pred_array[:remainder]])
             return projected
         else:
             # Downsample by taking every nth element
             step = current_dim // target_dim
-            projected = prediction[::step][:target_dim]
+            projected = pred_array[::step][:target_dim]
             return projected
 
     def get_consensus_prediction(
@@ -166,7 +176,7 @@ class ConsensusHierarchyManager(HierarchyManager):
         result = self.consensus_engine.aggregate(level_predictions, method=method) # type: ignore
         
         # Store as prior for next iteration (top-down feedback)
-        self.consensus_prior = result.aggregated_prediction
+        self.consensus_prior = result.prediction
         
         self.consensus_history.append(result)
         self.global_time_step += 1

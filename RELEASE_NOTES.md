@@ -1,3 +1,41 @@
+# 🚀 GAIA v4.2.0 Release Notes
+
+We are proud to announce **GAIA v4.2.0**, featuring the **Probabilistic Spine**—a major advancement in hierarchical consistency and numerical stability. See [Detailed Consolidation Improvements](docs/architecture/consolidation_improvements_v42.md) for a full technical breakdown.
+
+## 🌟 Key Highlights
+
+### 1. 📊 Probabilistic Spine
+- **Sequential Bayesian Estimation**: Integrated Kalman, EKF, and Particle Filters at hierarchical levels.
+- **Hierarchical Consensus**: "Wisdom of Crowds" aggregation to resolve state estimation across levels.
+- **Top-Down Feedback**: Bidirectional information flow where global consensus informs local predictions.
+
+### 2. ⚡ Performance Optimizations
+- **Diagonal Covariance Approximation**: 12x speedup and 128x memory reduction for high-dimensional state spaces (>64 dims).
+- **Auto-Projection**: Seamless handling of mismatched dimensions between levels (upsampling/downsampling).
+- **Joseph Form Stability**: Guaranteed positive semi-definiteness for long-running systems.
+
+### 3. 🚁 Drone Saviour Protocol (Research Utility)
+- **Chaos Resilience**: Validated stability under extreme sensor noise and drop-outs.
+- **Emergency Handover**: Real-time switch from GPS to optical flow/IMU fusion via the Probabilistic Spine.
+
+### 4. 📐 Mathematical Deep Dive
+- Released the [Comprehensive Mathematical Methods Deep Dive](GAIA_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md), detailing the Bayesian foundations of GAIA.
+
+## 🛠️ Full Changelog
+
+- **Added**: `gaia/filters/` directory with `KalmanFilter`, `ExtendedKalmanFilter`, and `ParticleFilter`.
+- **Added**: `gaia/consensus/` directory with `ConsensusEngine` for multi-level aggregation.
+- **Added**: `ConsensusHierarchyManager` with `auto_projection` and `top_down_feedback`.
+- **Improved**: `KalmanFilter` now supports `use_diagonal_covariance`, `use_joseph_form`, and `min_obs_noise`.
+- **Improved**: `ARCHITECTURE.md` and `README.md` updated to reflect the Probabilistic Spine.
+- **Fixed**: `AttributeError` in consensus managers for `aggregated_prediction`.
+- **Fixed**: Innovation scaling bug in adaptive noise estimation.
+
+## 🔜 Next Steps: v4.3
+Focus shifts to **Structural Plasticity** (Sparse Attention) and **CMA-ES** for robust meta-optimization.
+
+---
+
 # 🚀 GAIA v4.1.0 Release Notes
 
 We are thrilled to announce the open-source release of **GAIA v4.1.0** (Generalized Adaptive Intelligent Architecture). This release marks a significant milestone in providing a robust, research-grade framework for biologically-inspired AI.

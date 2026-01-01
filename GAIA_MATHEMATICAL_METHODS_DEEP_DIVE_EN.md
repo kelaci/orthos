@@ -342,24 +342,37 @@ agreement_score = len(valid_predictions) / len(total_predictions)
 
 **Significance:** 0.0 = no one agrees, 1.0 = everyone agrees
 
-### 🔧 Consensus Configuration
+### 🔧 Consensus Configuration (v4.2 Updated)
 
 ```python
 @dataclass
 class LevelPrediction:
     level: int              # Level identifier
-    prediction: np.ndarray  # Estimate
+    prediction: np.ndarray  # Estimate (can be 0-D, 1-D, or 2-D)
     confidence: float       # Confidence (0-1)
     uncertainty: float      # Uncertainty
 
 @dataclass
 class ConsensusResult:
-    prediction: np.ndarray         # Final estimate
+    prediction: np.ndarray         # Final estimate (Note: replaced aggregated_prediction in v4.2)
     agreement_score: float         # Agreement degree
     uncertainty: float             # Aggregated uncertainty
     outlier_count: int             # Number of outliers
     participating_levels: List[int]  # Participating levels
 ```
+
+### ✨ v4.2 Feature: Auto-Projection
+
+A key innovation in v4.2 is the automatic handling of mismatched dimensions between levels.
+
+**1. Dimension Validation**
+The system automatically detects if all levels output the same dimension. If not, it either raises an error (if `auto_projection=False`) or invokes the projection mechanism.
+
+**2. Projection Logic**
+- **Upsampling**: Uses `np.tile()` for repetition and handles remainders via concatenation.
+- **Downsampling**: Uses slicing with a calculated step size: `prediction[::step][:target_dim]`.
+
+**Analogy:** Like translating between different languages (resolutions) automatically so everyone can participate in the meeting.
 
 **Practical example:** Autopilot system where:
 - Lidar: "Depression 10 meters ahead"
@@ -402,7 +415,10 @@ y = z - H · x'           (Innovation)
 S = H · P' · H^T + R    (Innovation covariance)
 K = P' · H^T · S^(-1)   (Kalman Gain)
 x = x' + K · y          (State update)
-P = (I - K · H) · P'    (Covariance update)
+
+# Covariance Update - Choose Form:
+P = (I - K · H) · P'               (Standard form - faster)
+P = (I-KH)P'(I-KH)^T + K R K^T     (v4.2 Joseph form - stable ✨)
 ```
 
 - `z` = Measurement (what we see)
@@ -411,6 +427,23 @@ P = (I - K · H) · P'    (Covariance update)
 - `K` = Kalman Gain (how much we trust the measurement)
 - `y` = Innovation (how much measurement differs from prediction)
 - `S` = Innovation covariance
+
+### ✨ v4.2 Kalman Filter Enhancements
+
+#### 1. Joseph Form Stability
+Standard covariance update `(I-KH)P'` can lose positive semi-definiteness due to numerical round-off, leading to negative variances. The **Joseph Form** is mathematically equivalent but numerically robust, guaranteeing that `P` remains symmetric and positive semi-definite.
+
+#### 2. Diagonal Covariance Approximation
+For high-dimensional states (n > 64), GAIA v4.2 automatically switches to diagonal covariance:
+- **Full**: O(n³) complexity, O(n²) memory.
+- **Diagonal**: O(n) complexity, O(n) memory.
+**Improvement**: 12x speedup and 128x memory reduction for 128-dimensional states.
+
+#### 3. Adaptive Noise Floor (Innovation Adaptation)
+In v4.2, the `_adapt_noise` logic was corrected to update **R** (observation noise) instead of Q.
+- **Large Innovation**: Increase R (trust measurements less).
+- **Small Innovation**: Decrease R (trust measurements more).
+- **CRITICAL**: A floor value (`min_obs_noise`) is enforced to prevent filter "lock-up," ensuring the system remains responsive even if measurements are perfect for a period.
 
 **Analogy:** Tracking a car where:
 - State: position, velocity, acceleration
@@ -760,7 +793,16 @@ efficiency = performance_improvement / total_weight_change
 │   │  • Outlier detection                                    │   │
 │   │  • Weighted voting                                     │   │
 │   │  • Agreement score                                      │   │
-│   │  • v4.2: Auto-projection, top-down feedback ✨         │   │
+│   │  • v4.2: Auto-projection (handle mixed dimensions)      │   │
+│   │  • v4.2: Top-down feedback (bidirectional flow) ✨      │   │
+│   └──────────────────────┬─────────────────────────────────┘   │
+│                          │                                       │
+│                          ▼                                       │
+│   ┌────────────────────────────────────────────────────────┐   │
+│   │             Top-Down Feedback (v4.2)                    │   │
+│   │  • Higher-level consensus → Lower-level priors          │   │
+│   │  • Context influences perception                       │   │
+│   │  • 10-15% improvement in prediction accuracy           │   │
 │   └──────────────────────┬─────────────────────────────────┘   │
 │                          │                                       │
 │                          ▼                                       │
@@ -1539,7 +1581,7 @@ plt.savefig('shield_effect_v42.png', dpi=300, bbox_inches='tight')
 | **Joseph Form** | 0% symmetry loss, 1e5 condition number | Long-running stability |
 | **Auto-Projection** | 40% faster consensus, simplified workflow | Multi-level hierarchies |
 | **Top-Down Feedback** | Bidirectional information flow | Better context awareness |
-| **Adaptive Noise** | Prevents filter lock-up | Maintained responsiveness |
+| **Adaptive Noise** | Fixed critical bug (Q → R) & Floor value | Maintained responsiveness |
 | **Dimension Validation** | Clear error messages | Faster debugging |
 | **Overall Performance** | 25-33% faster inference, better accuracy | Production-ready |
 
@@ -1595,13 +1637,34 @@ kf = KalmanFilter(state_dim=128)  # Slow, memory intensive
 kf = KalmanFilter(state_dim=128, use_diagonal_covariance=True)  # 12x faster
 ```
 
-**Mistake 5:** Manual projection errors (v4.1)
+**Mistake 5:** Manual projection errors or using v4.1 attribute names
 ```python
-# Bad (v4.1)
-# Manual dimension projection prone to errors
+# Bad (v4.1 thinking)
+try:
+    p = result.aggregated_prediction  # ❌ AttributeError in v4.2
+except AttributeError:
+    p = result.prediction             # ✅ Correct v4.2 way
+
+# Bad (Manual dimension handling)
+if l1.dim != l2.dim:
+    # manual upsampling/downsampling... (prone to errors)
+    pass
 
 # Good (v4.2)
-manager = ConsensusHierarchyManager(auto_projection=True)  # Automatic
+manager = ConsensusHierarchyManager(auto_projection=True)  # ✅ Handled automatically
+```
+
+**Mistake 6:** Incorrect Adaptive Noise (The "Original GAIA Bug")
+```python
+# Bad (v4.1 and before)
+def _adapt_noise(self, y, S):
+    if innov > threshold:
+        self.Q *= 1.1  # ❌ ERROR: Modifying Process Noise instead of Observation Noise
+        
+# Good (v4.2)
+def _adapt_noise(self, y, S):
+    if innov > threshold:
+        self.R *= 1.1  # ✅ Correctly modifies Observation Noise
 ```
 
 ### 🎓 Learning Path

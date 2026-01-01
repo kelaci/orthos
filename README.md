@@ -309,9 +309,18 @@ gaia/
 │   │   ├── reactive.py          ← ReactiveLayer (feedforward)
 │   │   └── temporal.py          ← TemporalLayer (recurrent)
 │   │
+│   ├── consensus/               ← Consensus Layer (v4.2)
+│   │   └── engine.py            ← Aggregation logic
+│   │
+│   ├── filters/                 ← Probabilistic Spine (v4.2)
+│   │   ├── kalman.py            ← KalmanFilter & EKF
+│   │   └── particle.py          ← ParticleFilter
+│   │
 │   ├── hierarchy/               ← Hierarchical processing
 │   │   ├── level.py             ← HierarchicalLevel
-│   │   └── manager.py           ← HierarchyManager
+│   │   ├── filtered_level.py    ← FilteredHierarchicalLevel (v4.2)
+│   │   ├── consensus_manager.py ← ConsensusHierarchyManager (v4.2)
+│   │   └── manager.py           ← Base HierarchyManager
 │   │
 │   ├── plasticity/              ← Plasticity control
 │   │   ├── controller.py        ← PlasticityController
@@ -355,12 +364,16 @@ gaia/
 python test_gaia.py
 
 # Expected output:
-# 🚀 Running GAIA v4/v4.1 Tests
+# 🚀 Running GAIA v4.2.0 Tests
 # ==================================================
 # 🧪 Testing Layers...
 # ✅ ReactiveLayer test passed
 # ✅ HebbianCore test passed
 # ✅ TemporalLayer test passed
+# ...
+# 🧪 Testing Probabilistic Spine (v4.2)...
+# ✅ KalmanFilter test passed
+# ✅ ConsensusEngine test passed
 # ...
 # 🎉 All tests passed successfully!
 ```

@@ -170,21 +170,26 @@ class KalmanFilter(Module):
         # S = HP'H' + R
         if self.use_diagonal_covariance:
             # Simplified for diagonal P and R
-            S = np.diag(H @ np.diag(self.P) @ H.T) + R
+            # For diagonal P: HP'H' = H * diag(P) * H' (element-wise)
+            # This gives a full matrix, not diagonal, due to cross-terms
+            P_full = np.diag(self.P)
+            S = H @ P_full @ H.T + np.diag(R)
         else:
             S = H @ self.P @ H.T + R
 
         # K = P'H' inv(S) (Kalman Gain)
         try:
             if self.use_diagonal_covariance:
-                # Simplified Kalman gain for diagonal case
-                K = np.diag(self.P) @ H.T @ np.linalg.inv(S)
+                # For diagonal P, use full covariance in this step for accuracy
+                P_full = np.diag(self.P)
+                K = P_full @ H.T @ np.linalg.inv(S)
             else:
                 K = self.P @ H.T @ np.linalg.inv(S)
         except np.linalg.LinAlgError:
             # Fallback for singular matrix using Pseudo-inverse
             if self.use_diagonal_covariance:
-                K = np.diag(self.P) @ H.T @ np.linalg.pinv(S)
+                P_full = np.diag(self.P)
+                K = P_full @ H.T @ np.linalg.pinv(S)
             else:
                 K = self.P @ H.T @ np.linalg.pinv(S)
 
@@ -198,8 +203,11 @@ class KalmanFilter(Module):
             KH = K @ H
             IKH = self.I - KH
             if self.use_diagonal_covariance:
-                # For diagonal case, simplify
-                self.P = np.diag(np.diag(IKH) ** 2 * self.P + np.diag(K @ np.diag(R) @ K.T))
+                # For diagonal case, simplify: P_new = (I-KH)^2 * P_old + diag(KRK')
+                P_full = np.diag(self.P)
+                KRK_full = K @ np.diag(R) @ K.T
+                P_new_full = IKH @ P_full @ IKH.T + KRK_full
+                self.P = np.diag(P_new_full)
             else:
                 self.P = IKH @ self.P @ IKH.T + K @ R @ K.T
         else:
@@ -218,10 +226,17 @@ class KalmanFilter(Module):
 
     def _adapt_noise(self, y: np.ndarray, S: np.ndarray) -> None:
         """
-        Adapt process noise Q based on innovation.
+        Adapt observation noise R based on innovation (Innovation Adaptation).
+        
+        This implements adaptive noise estimation where R is updated based on
+        the magnitude of innovations. The adaptation follows:
+            R_t+1 = (1 - alpha) * R_t + alpha * innovation_t^2
+        
+        A floor value (min_obs_noise) prevents filter "lock-up" by ensuring
+        the filter remains responsive to new measurements.
         
         Args:
-            y: Innovation vector.
+            y: Innovation vector (z - Hx').
             S: Innovation covariance.
         """
         innovation_sq = float(np.dot(y, y))
@@ -229,13 +244,20 @@ class KalmanFilter(Module):
             trace_S = float(np.sum(S))
         else:
             trace_S = float(np.trace(S))
-            
+        
+        # Adaptation rate (alpha)
+        alpha = 0.1
+        
         if innovation_sq > 5.0 * trace_S:
-            self.Q *= 1.1
-            # Ensure minimum noise threshold
-            self.Q = np.maximum(self.Q, self.min_obs_noise)
+            # Innovation is large - increase observation noise (decrease trust in measurements)
+            self.R *= 1.1
         else:
-            self.Q *= 0.99
+            # Innovation is small - decrease observation noise (increase trust in measurements)
+            self.R *= 0.99
+        
+        # CRITICAL: Enforce minimum observation noise floor to prevent filter lock-up
+        # This ensures the filter always remains responsive to new measurements
+        self.R = np.maximum(self.R, self.min_obs_noise)
 
     # --- Module Interface Implementation ---
 

@@ -97,14 +97,31 @@ class HierarchicalConsensus(Module):
             ConsensusResult containing the aggregated estimate.
 
         Raises:
-            ValueError: If the predictions list is empty.
+            ValueError: If the predictions list is empty or dimensions are incompatible.
         """
         if not predictions:
             raise ValueError("No predictions provided to consensus engine")
 
-        # Convert list to array for processing
-        # Ensure predictions are at least 2D (N, D)
-        preds = np.array([p.prediction for p in predictions])
+        # Convert predictions to numpy arrays and check dimensions
+        pred_arrays = []
+        for p in predictions:
+            pred_array = np.asarray(p.prediction)
+            if pred_array.ndim == 0:
+                pred_array = pred_array.reshape(1)
+            pred_arrays.append(pred_array)
+        
+        # Check if all predictions have the same dimension
+        dimensions = [arr.shape[0] for arr in pred_arrays]
+        unique_dims = set(dimensions)
+        
+        if len(unique_dims) > 1:
+            raise ValueError(
+                f"Cannot aggregate predictions with incompatible dimensions: {unique_dims}. "
+                f"Use ConsensusHierarchyManager with auto_projection=True to handle mismatched dimensions."
+            )
+        
+        # Now convert to 2D array safely
+        preds = np.array(pred_arrays)
         if preds.ndim == 1:
             preds = preds[:, np.newaxis]
 
