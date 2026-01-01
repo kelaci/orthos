@@ -8,7 +8,7 @@ ORTHOS v5.0 is a hierarchical neural architecture designed for:
 - **Temporal abstraction**: Processing information at multiple time scales (1x, 2x, 4x, 8x)
 - **Probabilistic Spine**: Sequential Bayesian estimation using Kalman and Particle filters
 - **Consensus Engine**: "Wisdom of Crowds" aggregation across hierarchical levels
-- **Meta-learning of plasticity**: Learning how to learn through evolutionary strategies
+- **Meta-learning of plasticity**: Learning how to learn through Hybrid NES + Bandit strategies
 - **Biological plausibility**: Hebbian learning, top-down feedback, and dual-timescale memory
 
 ## 🏗️ Core Architecture
@@ -52,7 +52,7 @@ ORTHOS v5.0 is a hierarchical neural architecture designed for:
 │  ┌─────────────────────────────────────────────────────────────────────────┐  │
 │  │                          Learning & Plasticity                          │  │
 │  │  ┌─────────────────────────────────────────────────────────────────────┐  │  │
-│  │  │           PlasticityController (Meta-Learning/ES)                   │  │  │
+│  │  │           PlasticityController (HML Manager: NES + Bandit)          │  │  │
 │  │  ├─────────────────────────────────────────────────────────────────────┤  │  │
 │  │  │           HebbianCore (Classic, Oja, BCM, STDP)                     │  │  │
 │  │  └─────────────────────────────────────────────────────────────────────┘  │  │
@@ -80,11 +80,12 @@ ORTHOS v5.0 is a hierarchical neural architecture designed for:
 - Progressive information compression
 - Bidirectional communication between levels
 
-### Plasticity Control
-- Evolutionary Strategy for parameter optimization
-- Multiple plasticity rules (Hebbian, Oja, BCM, STDP)
-- Dual-timescale traces (Hippocampal/Neocortical)
-- Dynamic adaptation to task requirements
+### Hybrid Meta-Learning (HML)
+- **Natural Evolution Strategy (NES)** for global parameter mapping
+- **Contextual Bandit** for real-time online adaptation
+- **Plasticity Rules**: Multiple variants (Hebbian, Oja, BCM, STDP)
+- **Dual-timescale traces**: Hippocampal/Neocortical abstraction
+- **Dynamic modulation**: Context-aware parameter scaling
 
 ### Probabilistic Spine (v5.0)
 - **Filters**: Kalman (Linear), EKF (Non-linear), Particle (General)
@@ -117,9 +118,9 @@ ORTHOS v5.0 is a hierarchical neural architecture designed for:
 ## 🔮 Future Directions
 
 - **v5.0 ✅**: Major Rebrand, Probabilistic Spine, Consensus Engine, Numerical Stability
-- **v5.1**: Advanced ES variants (CMA-ES, NES) and Attention mechanisms
-- **v5.2**: Neuroevolution and Direct Topology Optimization
-- **v5.3**: Multi-modal sensory integration (Cross-modal attention)
+- **v5.1 ✅**: Hybrid Meta-Learning (HML), Natural Evolution Strategies (NES)
+- **v5.2**: Multi-objective reward structures for Active Inference
+- **v5.3**: Neuroevolution and Direct Topology Optimization
 
 
 See [Roadmap](ROADMAP.md) for detailed development plans.# Core Components

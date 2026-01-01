@@ -11,6 +11,7 @@ from typing import Tuple, Optional, Literal, Dict, Any, Union, List
 from orthos.hierarchy.level import HierarchicalLevel
 from orthos.filters.kalman import KalmanFilter, ExtendedKalmanFilter, SquareRootKalmanFilter, BlockDiagonalKalmanFilter
 from orthos.filters.particle import ParticleFilter
+from orthos.meta_learning.hybrid_manager import HybridMetaManager
 
 
 class FilteredHierarchicalLevel(HierarchicalLevel):
@@ -87,6 +88,20 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
         self.uncertainty_history: List[float] = []
         self.state_history: List[np.ndarray] = []
         self._current_concept: Optional[str] = None
+
+        # Hybrid Meta-Learning Manager
+        base_meta_params = {
+            'adaptation_rate': kwargs.get('adaptation_rate', 0.01),
+            'exploration_noise': kwargs.get('exploration_noise', 0.1),
+            'consensus_threshold': kwargs.get('consensus_threshold', 3.0),
+            'process_noise_scale': process_noise,
+            'obs_noise_scale': obs_noise
+        }
+        self.meta_manager = HybridMetaManager(
+            base_parameters=base_meta_params,
+            use_bandit=kwargs.get('use_meta_bandit', True),
+            use_nes=kwargs.get('use_meta_nes', False)
+        )
 
     def _init_filter(
         self, 
@@ -211,6 +226,68 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
 
         if self.filter is None:
             return raw_output, 0.0
+
+        # 1.5. Hybrid Meta-Learning Hook: Dynamic Adaptation
+        if self.meta_manager is not None:
+            # A. Compute Context Features
+            # 1. Prediction Error (Reconstruction)
+            error = 0.0
+            if self.state_history:
+                last_pred = self.state_history[-1]
+                # Simple L2 error if dimensions match (otherwise 0.0)
+                if last_pred.shape == raw_output.shape:
+                    error = float(np.linalg.norm(raw_output - last_pred))
+            
+            # 2. Uncertainty
+            unc = self.uncertainty_history[-1] if self.uncertainty_history else 0.0
+            
+            # 3. Sparsity (Ratio of near-zero activations)
+            sparsity = float(np.mean(np.abs(raw_output) < 1e-3))
+            
+            # 4. Drift (Rate of change in representation)
+            drift = 0.0
+            if len(self.state_history) >= 2:
+                drift = float(np.linalg.norm(self.state_history[-1] - self.state_history[-2]))
+                
+            context = np.array([error, unc, sparsity, drift])
+            
+            # B. Get Modulated Parameters
+            modulated = self.meta_manager.step(context)
+            
+            # C. Apply Modulation
+            # 1. Apply to neural layers (Plasticity)
+            for layer in self.processing_layers:
+                if hasattr(layer, 'set_plasticity_params'):
+                    layer.set_plasticity_params({
+                        'learning_rate': modulated.get('adaptation_rate', 0.01)
+                    })
+            
+            # 2. Apply to Filter (Noise levels)
+            if self.filter is not None:
+                # Update R and Q based on meta-scales (Relative to base parameters)
+                # This prevents cumulative explosion/collapse
+                base_r = self.meta_manager.base_params.get('obs_noise_scale', 0.1)
+                base_q = self.meta_manager.base_params.get('process_noise_scale', 0.01)
+                
+                # Modulated multiplier
+                scale_r = modulated.get('obs_noise_scale', base_r) / (base_r + 1e-9)
+                scale_q = modulated.get('process_noise_scale', base_q) / (base_q + 1e-9)
+                
+                # Set values on filter (maintaining correct array/diagonal structure)
+                target_r = base_r * scale_r
+                target_q = base_q * scale_q
+                
+                if self.filter.use_diagonal_covariance:
+                    self.filter.R = np.ones(self.filter.obs_dim) * target_r
+                    self.filter.Q = np.ones(self.filter.state_dim) * target_q
+                else:
+                    self.filter.R = np.eye(self.filter.obs_dim) * target_r
+                    self.filter.Q = np.eye(self.filter.state_dim) * target_q
+                
+            # D. Feedback (Reward)
+            # Reward is negative loss and negative uncertainty
+            reward = -(error + 0.5 * unc + 0.1 * drift)
+            self.meta_manager.update_feedback(reward)
 
         # 2. Filtering cycle with Bayesian fusion
         if self.filter is not None and not isinstance(self.filter, ParticleFilter):
