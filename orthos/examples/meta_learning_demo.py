@@ -20,7 +20,7 @@ def meta_learning_demo():
     print("=" * 50)
 
     # Setup logging
-    logger = setup_logging('gaia_meta', 'INFO')
+    logger = setup_logging('orthos_meta', 'INFO')
     logger.info("Starting ORTHOS meta-learning demo")
 
     # Create target modules

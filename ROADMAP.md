@@ -14,6 +14,8 @@
 - [x] Meta-learning framework with early stopping
 - [x] GPU Acceleration with CuPy (Hybrid System)
 - [x] **Probabilistic Spine (Kalman/Particle Filters)**
+- [x] **SR-KF and Block-Diagonal Filters (v5.0 Master)** ✨
+- [x] **Dynamic Top-Down Modulation (Regime-Aware)** ✨
 - [x] **Consensus Engine (Hierarchical Aggregation)**
 - [x] Comprehensive documentation and benchmarks
 
@@ -25,7 +27,8 @@
 - Robust meta-learning with convergence checks
 - Automatic GPU/CPU dispatch
 - **Bayesian state estimation & multi-level consensus**
-- **Numerically stable high-dimensional filtering**
+- **Numerically stable SR-KF & Block-Diagonal filtering**
+- **Regime-aware dynamic top-down modulation**
 
 ## 🚀 v5.1 - Structural Plasticity & Advanced Optimization (Next Focus)
 
@@ -130,9 +133,11 @@
 
 ## 📋 Version History
 
-### v5.0 (2026-01-01)
-- **Major Rebrand**: GAIA → ORTHOS
+### v5.0 (2026-01-01) - Master Improvements
+- **Major Rebrand**: ORTHOS → ORTHOS
 - Integration of Probabilistic Spine (Kalman, EKF, Particle Filters)
+- **New Filters**: Square Root KF (SR-KF) and Block-Diagonal KF
+- **Dynamic Modulation**: Context-aware noise adaptation (Stable/Transition/Storm)
 - Consensus Engine & Hierarchical Coordination
 - Joseph Form & Diagonal Covariance Optimizations
 - Top-Down Feedback mechanisms

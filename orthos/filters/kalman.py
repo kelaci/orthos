@@ -4,14 +4,17 @@ Kalman Filter implementations for ORTHOS.
 This module implements:
 - Standard Kalman Filter (KF)
 - Extended Kalman Filter (EKF)
+- Square Root Kalman Filter (SR-KF)
+- Block-Diagonal Kalman Filter
 
 All implementations follow the ORTHOS coding standard and inherit from Module.
 """
 
 import numpy as np
-from typing import Optional, Tuple, Callable, Union, List
+from typing import Optional, Tuple, Callable, Union, List, Dict, Any
 
 from orthos.core.base import Module
+from orthos.utils.jit import jit
 
 
 class KalmanFilter(Module):
@@ -126,21 +129,17 @@ class KalmanFilter(Module):
 
         # P = FPF' + Q
         if self.use_diagonal_covariance:
-            # For diagonal covariance, simplify: P[i] = sum_j F[i,j]^2 * P[j] + Q[i]
-            # Assuming diagonal Q and ignoring cross-terms for efficiency
-            P_new = np.zeros_like(self.P)
-            for i in range(self.state_dim):
-                P_new[i] = np.sum(F[i, :] ** 2 * self.P) + self.Q[i]
-            self.P = P_new
+            self.P = _predict_diagonal_P(self.P, F, self.Q, self.state_dim)
         else:
             self.P = F @ self.P @ F.T + self.Q
 
+
     def update(
         self,
-        z: np.ndarray,
+        z: Union[np.ndarray, float],
         H: Optional[np.ndarray] = None,
         R_override: Optional[np.ndarray] = None
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray]:  # type: ignore[override]
         """
         Perform update step (Measurement Update).
 
@@ -150,7 +149,7 @@ class KalmanFilter(Module):
         state spaces (e.g., 256+ dimensions).
 
         Args:
-            z: Observation vector.
+            z: Observation vector (or scalar).
             H: Observation matrix (default: Identity mapping state to obs).
             R_override: Optional override for observation noise covariance.
 
@@ -160,6 +159,8 @@ class KalmanFilter(Module):
         Raises:
             ValueError: If observation dimension mismatch.
         """
+        if isinstance(z, (float, int, np.float64)):
+            z = np.array([z])
         if H is None:
             # Assume 1-to-1 observation of first obs_dim states
             H = np.eye(self.obs_dim, self.state_dim)
@@ -291,15 +292,41 @@ class KalmanFilter(Module):
 
         return self.x, self.P
 
+    def forward(self, x: np.ndarray) -> np.ndarray:
+        """
+        Perform one full filter step: Predict -> Update.
+        
+        Args:
+            x: Observation vector z.
+            
+        Returns:
+            Estimated state vector x.
+        """
+        self.predict()
+        self.update(x)
+        return self.x
+
+    def backward(self, grad: np.ndarray) -> np.ndarray:
+        """
+        Backward pass (not implemented for fixed Kalman Filter).
+        
+        Args:
+            grad: Upstream gradient.
+            
+        Returns:
+            Downstream gradient (zeros).
+        """
+        return np.zeros_like(grad)
+
     def _adapt_noise_diagonal(
         self,
         y: np.ndarray,
         S: np.ndarray
     ) -> None:
         """
-        Adapt observation noise R based on innovation (diagonal version).
+        Adapt observation noise R and process noise Q based on innovation (diagonal version).
         
-        This implements adaptive noise estimation where R is updated based on
+        This implements adaptive noise estimation where R and Q are updated based on
         the magnitude of innovations. Uses element-wise operations for efficiency.
 
         Args:
@@ -315,24 +342,19 @@ class KalmanFilter(Module):
         if innovation_sq > 5.0 * trace_S:
             # Innovation is large - increase observation noise (decrease trust in measurements)
             self.R *= 1.1
+            self.Q *= 1.05  # Also increase process noise to allow more flexibility
         else:
             # Innovation is small - decrease observation noise (increase trust in measurements)
             self.R *= 0.99
+            self.Q *= 0.995
         
-        # CRITICAL: Enforce minimum observation noise floor to prevent filter lock-up
-        # This ensures the filter always remains responsive to new measurements
+        # CRITICAL: Enforce minimum noise floors
         self.R = np.maximum(self.R, self.min_obs_noise)
+        self.Q = np.maximum(self.Q, 1e-8)
 
     def _adapt_noise(self, y: np.ndarray, S: np.ndarray) -> None:
         """
-        Adapt observation noise R based on innovation (Innovation Adaptation).
-        
-        This implements adaptive noise estimation where R is updated based on
-        the magnitude of innovations. The adaptation follows:
-            R_t+1 = (1 - alpha) * R_t + alpha * innovation_t^2
-        
-        A floor value (min_obs_noise) prevents filter "lock-up" by ensuring
-        the filter remains responsive to new measurements.
+        Adapt observation noise R and process noise Q based on innovation.
         
         Args:
             y: Innovation vector (z - Hx').
@@ -348,44 +370,21 @@ class KalmanFilter(Module):
         alpha = 0.1
         
         if innovation_sq > 5.0 * trace_S:
-            # Innovation is large - increase observation noise (decrease trust in measurements)
+            # Innovation is large - increase noise
             self.R *= 1.1
+            self.Q *= 1.05
         else:
-            # Innovation is small - decrease observation noise (increase trust in measurements)
+            # Innovation is small - decrease noise
             self.R *= 0.99
+            self.Q *= 0.995
         
-        # CRITICAL: Enforce minimum observation noise floor to prevent filter lock-up
-        # This ensures the filter always remains responsive to new measurements
+        # Enforce floors
         self.R = np.maximum(self.R, self.min_obs_noise)
+        if self.use_diagonal_covariance:
+            self.Q = np.maximum(self.Q, 1e-8)
+        else:
+            self.Q = np.maximum(self.Q, np.eye(self.state_dim) * 1e-8)
 
-    # --- Module Interface Implementation ---
-
-    def forward(self, x: np.ndarray) -> np.ndarray:
-        """
-        Standard Module forward pass.
-        
-        Interpret 'x' as observation 'z'.
-        Performs Predict -> Update cycle assuming Identity drift and Obs.
-        
-        Args:
-            x: Observation vector.
-            
-        Returns:
-            Estimated state vector.
-        """
-        self.predict()
-        self.update(x)
-        return self.x
-
-    def backward(self, grad: np.ndarray) -> np.ndarray:
-        """
-        Backward pass not implemented for Kalman Filter.
-        
-        Raises:
-            NotImplementedError
-        """
-        raise NotImplementedError("KalmanFilter does not support backpropagation.")
-    
     def update_parameters(self, lr: float) -> None:
         """
         No learnable parameters to update via SGD.
@@ -474,3 +473,279 @@ class ExtendedKalmanFilter(KalmanFilter):
             self.P = P_new
         else:
             self.P = F @ self.P @ F.T + self.Q
+
+
+class SquareRootKalmanFilter(KalmanFilter):
+    """
+    Square Root Kalman Filter (SR-KF) for numerical stability.
+    
+    Instead of full covariance P, we store and update its square root factor S,
+    where P = SS^T. This doubles the numerical precision of covariance 
+    calculations and ensures P remains positive semi-definite.
+    """
+
+    def __init__(
+        self,
+        state_dim: int,
+        obs_dim: int,
+        process_noise: float = 0.01,
+        obs_noise: float = 0.1,
+        **kwargs: Any
+    ):
+        """
+        Initialize SquareRootKalmanFilter.
+
+        Args:
+            state_dim: Dimension of the state vector.
+            obs_dim: Dimension of the observation vector.
+            process_noise: Initial process noise covariance scalar.
+            obs_noise: Initial observation noise covariance scalar.
+            **kwargs: Parameters passed to base KalmanFilter.
+        """
+        super().__init__(state_dim, obs_dim, process_noise, obs_noise, **kwargs)
+        # Store square root factor S (usually Lower Triangular)
+        if self.use_diagonal_covariance:
+            # For diagonal, S is just sqrt of P elements
+            self.S = np.sqrt(self.P)
+            self.SQ = np.sqrt(self.Q)
+            self.SR = np.sqrt(self.R)
+        else:
+            # For full, use Cholesky decomposition
+            self.S = np.linalg.cholesky(self.P)
+            self.SQ = np.linalg.cholesky(self.Q)
+            self.SR = np.linalg.cholesky(self.R)
+
+    def predict(
+        self,
+        F: Optional[np.ndarray] = None,
+        B: Optional[np.ndarray] = None,
+        u: Optional[np.ndarray] = None
+    ) -> None:
+        """
+        Perform SR-KF prediction step.
+
+        Uses QR decomposition to propagate the square root factor S.
+
+        Args:
+            F: State transition matrix. Defaults to Identity.
+            B: Control input matrix.
+            u: Control input vector.
+        """
+        if F is None:
+            F = self.I
+        # x = Fx + Bu
+        self.x = F @ self.x
+        if B is not None and u is not None:
+            self.x += B @ u
+
+        # S = QR([F*S, SQ]^T)
+        if self.use_diagonal_covariance:
+            self.S = np.sqrt(np.sum(F**2 * self.S**2, axis=1) + self.SQ**2)
+        else:
+            # Combined matrix for QR
+            # [ F*S  SQ ]
+            compound = np.hstack([F @ self.S, self.SQ])
+            # Use QR decomposition to get back a lower triangular S
+            _, r = np.linalg.qr(compound.T)
+            self.S = r.T[:self.state_dim, :self.state_dim]
+
+    def update(
+        self,
+        z: Union[np.ndarray, float],
+        H: Optional[np.ndarray] = None,
+        R_override: Optional[np.ndarray] = None
+    ) -> Tuple[np.ndarray, np.ndarray]:  # type: ignore[override]
+        """
+        Perform SR-KF update step.
+
+        Args:
+            z: Observation vector (or scalar).
+            H: Observation matrix. Defaults to Identity.
+            R_override: Optional covariance override for observation noise.
+
+        Returns:
+            Tuple of (updated state x, full covariance matrix P).
+        """
+        if isinstance(z, (float, int, np.float64)):
+            z = np.array([z])
+        if H is None:
+            H = np.eye(self.obs_dim, self.state_dim)
+
+        SR = np.linalg.cholesky(R_override) if R_override is not None else self.SR
+
+        if self.use_diagonal_covariance and np.array_equal(H, np.eye(self.state_dim)):
+            # Optimized diagonal SR-KF update
+            S2 = self.S**2
+            SR2 = SR**2
+            K = S2 / (S2 + SR2)
+            self.x += K * (z - self.x)
+            self.S = np.sqrt((1.0 - K) * S2)
+            return self.x, self.S**2
+
+        # Standard SR-KF Update using QR
+        # [ SR      H*S ]
+        # [ 0       S   ] -> QR -> [ S_innov^1/2   K*S_innov^1/2 ]
+        #                         [ 0             S_post       ]
+        if not self.use_diagonal_covariance:
+            m, n = H.shape
+            compound = np.zeros((m + n, m + n))
+            compound[:m, :m] = SR
+            compound[:m, m:] = H @ self.S
+            compound[m:, m:] = self.S
+            
+            _, r = np.linalg.qr(compound.T)
+            
+            # r is upper triangular:
+            # [ R11  R12 ]
+            # [ 0    R22 ]
+            r11 = r[:m, :m]
+            r12 = r[:m, m:]
+            r22 = r[m:, m:]
+            
+            # S_post = R22^T (to keep it lower triangular)
+            self.S = r22.T
+            
+            # Kalman gain: K = R12^T * inv(R11^T)  =>  K * R11^T = R12^T
+            # Or R11 * K^T = R12
+            y = z - H @ self.x
+            try:
+                kt = np.linalg.solve(r11, r12)
+                self.x += (kt.T @ y)
+            except np.linalg.LinAlgError:
+                kt = np.linalg.pinv(r11) @ r12
+                self.x += (kt.T @ y)
+            
+            return self.x, self.S @ self.S.T
+        else:
+            # Diagonal case with general H (rare but supported)
+            P = self.S**2
+            R = SR**2
+            # Fallback to standard update but return P = S^2
+            x, P_new = self._update_standard(z, H, np.diag(R) if R.ndim == 1 else R)
+            self.S = np.sqrt(np.diag(P_new))
+            return x, P_new
+
+
+class BlockDiagonalKalmanFilter(KalmanFilter):
+    """
+    Block-Diagonal Kalman Filter for balanced efficiency and correlation tracking.
+    
+    Variables within a block are fully correlated (Standard KF), 
+    while variables in different blocks are assumed independent (Diagonal KF).
+    """
+
+    def __init__(
+        self,
+        state_dim: int,
+        obs_dim: int,
+        block_structure: Optional[List[List[int]]] = None,
+        **kwargs: Any
+    ):
+        """
+        Initialize BlockDiagonalKalmanFilter.
+
+        Args:
+            state_dim: Dimension of the state vector.
+            obs_dim: Dimension of the observation vector.
+            block_structure: List of index lists defining blocks.
+            **kwargs: Parameters passed to internal KalmanFilters.
+        """
+        super().__init__(state_dim, obs_dim, **kwargs)
+        self.block_structure = block_structure or self._detect_blocks()
+        
+        # Initialize blocks
+        self.blocks = []
+        for indices in self.block_structure:
+            sub_state_dim = len(indices)
+            # Find which observation indices match these state indices
+            # For simplicity, assume H is identity or we only observe these states
+            sub_obs_bits = [i for i in range(obs_dim) if i in indices]
+            sub_obs_dim = len(sub_obs_bits)
+            
+            if sub_obs_dim > 0:
+                kf = KalmanFilter(
+                    state_dim=sub_state_dim,
+                    obs_dim=sub_obs_dim,
+                    process_noise=kwargs.get('process_noise', 0.01),
+                    obs_noise=kwargs.get('obs_noise', 0.1),
+                    **kwargs
+                )
+                self.blocks.append((indices, sub_obs_bits, kf))
+
+    def _detect_blocks(self) -> List[List[int]]:
+        """Automatically group states into blocks of 4 if not specified."""
+        size = 4
+        blocks = []
+        for i in range(0, self.state_dim, size):
+            blocks.append(list(range(i, min(i + size, self.state_dim))))
+        return blocks
+
+    def predict(
+        self, 
+        F: Optional[np.ndarray] = None, 
+        B: Optional[np.ndarray] = None, 
+        u: Optional[np.ndarray] = None
+    ) -> None:
+        """
+        Perform prediction for each sub-block filter.
+
+        Args:
+            F: Global state transition matrix (will be sliced).
+            B: Global control matrix (will be sliced).
+            u: Global control vector.
+        """
+        self.x = np.zeros(self.state_dim)
+        for indices, _, kf in self.blocks:
+            # Sub-matrices
+            sub_F = F[np.ix_(indices, indices)] if F is not None else None
+            # Note: Complex B/u slicing is simplified here to direct pass-through
+            sub_u = u if u is not None else None
+            kf.predict(F=sub_F, u=sub_u)
+            self.x[indices] = kf.x
+
+    def update(
+        self, 
+        z: Union[np.ndarray, float], 
+        H: Optional[np.ndarray] = None, 
+        R_override: Optional[np.ndarray] = None
+    ) -> Tuple[np.ndarray, np.ndarray]:  # type: ignore[override]
+        """
+        Perform update for each sub-block filter.
+
+        Args:
+            z: Observation vector (or scalar).
+            H: Global observation matrix (will be sliced).
+            R_override: Global observation noise override (will be sliced).
+
+        Returns:
+            Tuple of (updated state x, current block-diagonal P).
+        """
+        if isinstance(z, (float, int, np.float64)):
+            z = np.array([z])
+        for indices, obs_bits, kf in self.blocks:
+            if not obs_bits:
+                continue
+            
+            sub_z = z[obs_bits]
+            sub_H = H[np.ix_(obs_bits, indices)] if H is not None else None
+            sub_R = R_override[np.ix_(obs_bits, obs_bits)] if R_override is not None else None
+            
+            kf.update(sub_z, H=sub_H, R_override=sub_R)
+            self.x[indices] = kf.x
+            
+            # Reconstruct part of P if using diagonal mode for base
+            if self.use_diagonal_covariance:
+                self.P[indices] = kf.P
+            else:
+                self.P[np.ix_(indices, indices)] = kf.P
+            
+        return self.x, self.P
+
+@jit(nopython=True)
+def _predict_diagonal_P(P, F, Q, state_dim):
+    """JIT optimized diagonal covariance prediction."""
+    # For diagonal covariance, simplify: P[i] = sum_j F[i,j]^2 * P[j] + Q[i]
+    P_new = np.zeros_like(P)
+    for i in range(state_dim):
+        P_new[i] = np.sum(F[i, :] ** 2 * P) + Q[i]
+    return P_new

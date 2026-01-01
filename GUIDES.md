@@ -205,9 +205,9 @@ from orthos.utils.logging import setup_logging
 
 # Setup comprehensive logging
 logger = setup_logging(
-    name='gaia_demo',
+    name='orthos_demo',
     level='INFO',
-    log_file='gaia_demo.log'
+    log_file='orthos_demo.log'
 )
 
 logger.info("Starting ORTHOS demo")
@@ -726,7 +726,7 @@ python test_orthos.py
 ### 1.2 PyTorch Implementation (v3.1)
 
 ```python
-from gaia_protocol import run_comprehensive_validation
+from orthos_protocol import run_comprehensive_validation
 
 # Run 200-step validation
 agent = run_comprehensive_validation()
@@ -1183,13 +1183,13 @@ def run_full_validation_suite(cfg=None):
     Run complete validation suite
     """
     if cfg is None:
-        cfg = GaiaConfigEnhanced()
+        cfg = OrthosConfigEnhanced()
     
     print("="*60)
     print("🔬 ORTHOS FULL VALIDATION SUITE")
     print("="*60)
     
-    agent = GaiaAgentEnhanced(cfg)
+    agent = OrthosAgentEnhanced(cfg)
     
     results = {}
     
@@ -1211,17 +1211,17 @@ def run_full_validation_suite(cfg=None):
     
     # Test 3: Gradient Stability
     print("\n📋 Test 3: Gradient Stability (100 steps)")
-    agent = GaiaAgentEnhanced(cfg)  # Fresh agent
+    agent = OrthosAgentEnhanced(cfg)  # Fresh agent
     results['gradient_stability'] = test_gradient_stability(agent, steps=100)
     
     # Test 4: Memory Stability
     print("\n📋 Test 4: Memory Stability (500 steps)")
-    agent = GaiaAgentEnhanced(cfg)  # Fresh agent
+    agent = OrthosAgentEnhanced(cfg)  # Fresh agent
     results['memory_stability'] = test_memory_stability(agent, steps=500)
     
     # Test 5: Performance Benchmark
     print("\n📋 Test 5: Performance Benchmark")
-    agent = GaiaAgentEnhanced(cfg)
+    agent = OrthosAgentEnhanced(cfg)
     throughput = benchmark_forward_pass(agent)
     results['throughput'] = throughput
     
@@ -1282,7 +1282,7 @@ jobs:
       run: python test_orthos.py
     
     - name: Run PyTorch validation
-      run: python -c "from gaia_protocol import run_comprehensive_validation; run_comprehensive_validation()"
+      run: python -c "from orthos_protocol import run_comprehensive_validation; run_comprehensive_validation()"
     
     - name: Run stability tests
       run: pytest tests/test_stability.py -v
@@ -1336,7 +1336,7 @@ This guide explains how they relate and when to use each.
 │   • Recurrent weights                 • Layer with temporal context      │
 │   • Time window                       • Hidden state                     │
 │                                                                          │
-│   PlasticityController ◄────────────► GaiaAgentEnhanced                 │
+│   PlasticityController ◄────────────► OrthosAgentEnhanced                 │
 │   • ES optimizer                      • Active Inference                 │
 │   • Parameter adaptation              • EFE-based selection              │
 │                                                                          │
@@ -1386,11 +1386,11 @@ representations = manager.process_hierarchy(input_data, time_steps=100)
 
 ```python
 # PyTorch v3.1 example
-from gaia_protocol import GaiaAgentEnhanced, GaiaConfigEnhanced
+from orthos_protocol import OrthosAgentEnhanced, OrthosConfigEnhanced
 
 # Create agent
-cfg = GaiaConfigEnhanced(state_dim=4, action_dim=2)
-agent = GaiaAgentEnhanced(cfg)
+cfg = OrthosConfigEnhanced(state_dim=4, action_dim=2)
+agent = OrthosAgentEnhanced(cfg)
 
 # Training loop
 for step in range(1000):
@@ -1471,7 +1471,7 @@ def update(self, lr):
 import numpy as np
 import torch
 from orthos.layers.hebbian import HebbianCore  # NumPy for prototyping
-from gaia_protocol import DiagnosticPlasticLinear  # PyTorch for training
+from orthos_protocol import DiagnosticPlasticLinear  # PyTorch for training
 
 # 1. Prototype with NumPy
 numpy_layer = HebbianCore(10, 20, plasticity_rule='bcm')
@@ -1491,7 +1491,7 @@ pytorch_layer.weight.data = torch.from_numpy(numpy_layer.weights.T).float()
 from dataclasses import dataclass
 
 @dataclass
-class UnifiedGaiaConfig:
+class UnifiedOrthosConfig:
     """Configuration compatible with both implementations"""
     
     # Dimensions
@@ -1515,8 +1515,8 @@ class UnifiedGaiaConfig:
     
     def to_pytorch_config(self):
         """Convert to PyTorch v3.1 format"""
-        from gaia_protocol import GaiaConfigEnhanced
-        return GaiaConfigEnhanced(
+        from orthos_protocol import OrthosConfigEnhanced
+        return OrthosConfigEnhanced(
             hidden_dim=self.hidden_dim,
             fast_trace_decay=self.fast_decay,
             slow_trace_decay=self.slow_decay,
@@ -1540,7 +1540,7 @@ PyTorch for plastic learning within levels
 import numpy as np
 import torch
 from orthos.hierarchy.manager import HierarchyManager
-from gaia_protocol import DiagnosticPlasticLinear, GaiaConfigEnhanced
+from orthos_protocol import DiagnosticPlasticLinear, OrthosConfigEnhanced
 
 class HybridHierarchicalLevel:
     """Hierarchical level with PyTorch plastic core"""
@@ -1568,7 +1568,7 @@ class HybridHierarchicalLevel:
         return output.detach().cpu().numpy()
 
 # Usage
-cfg = GaiaConfigEnhanced()
+cfg = OrthosConfigEnhanced()
 manager = HierarchyManager()
 
 level0 = HybridHierarchicalLevel(0, 10, 20, cfg)
@@ -1583,12 +1583,12 @@ Use PyTorch for training,
 NumPy for offline analysis
 """
 
-from gaia_protocol import GaiaAgentEnhanced
+from orthos_protocol import OrthosAgentEnhanced
 import numpy as np
 from orthos.utils.visualization import plot_weight_matrix
 
 # Train with PyTorch
-agent = GaiaAgentEnhanced(cfg)
+agent = OrthosAgentEnhanced(cfg)
 for step in range(1000):
     # ... training loop
 
@@ -1622,7 +1622,7 @@ numpy_config = {
 }
 
 # New PyTorch config
-pytorch_config = GaiaConfigEnhanced(
+pytorch_config = OrthosConfigEnhanced(
     fast_trace_lr=0.01,
     fast_trace_decay=0.95,  # 1 - decay_rate * 50 (roughly)
 )
@@ -1635,7 +1635,7 @@ from orthos.layers.hebbian import HebbianCore
 layer = HebbianCore(10, 20)
 
 # New
-from gaia_protocol import DiagnosticPlasticLinear
+from orthos_protocol import DiagnosticPlasticLinear
 layer = DiagnosticPlasticLinear(10, 20, cfg)
 ```
 
@@ -1724,8 +1724,8 @@ class TestPlasticityUnified:
     
     @pytest.fixture
     def pytorch_layer(self):
-        from gaia_protocol import DiagnosticPlasticLinear, GaiaConfigEnhanced
-        cfg = GaiaConfigEnhanced()
+        from orthos_protocol import DiagnosticPlasticLinear, OrthosConfigEnhanced
+        cfg = OrthosConfigEnhanced()
         return DiagnosticPlasticLinear(10, 20, cfg)
     
     def test_output_shape_numpy(self, numpy_layer):
@@ -1792,7 +1792,7 @@ orthos/
 │   ├── hierarchy/
 │   ├── plasticity/
 │   └── ...
-├── gaia_torch/              # PyTorch v3.1
+├── orthos_torch/              # PyTorch v3.1
 │   ├── layers/
 │   │   └── plastic_linear.py
 │   ├── models/
@@ -1800,7 +1800,7 @@ orthos/
 │   ├── agents/
 │   │   └── active_inference.py
 │   └── ...
-├── gaia_protocol.py         # Single-file PyTorch implementation
+├── orthos_protocol.py         # Single-file PyTorch implementation
 └── tests/
     ├── test_numpy.py
     ├── test_pytorch.py

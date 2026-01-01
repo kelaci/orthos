@@ -296,7 +296,7 @@ Comprehensive test suite validates all three optimizations:
 
 ```bash
 # Simple test runner (no pytest dependency)
-PYTHONPATH=/home/acil/dev/gaia python tests/integration/test_bayesian_optimizations_simple.py
+PYTHONPATH=/home/acil/dev/orthos python tests/integration/test_bayesian_optimizations_simple.py
 
 # Expected output:
 # 🎉 10/11 tests passed
@@ -532,5 +532,5 @@ This implementation follows the ORTHOS project license (MIT). See LICENSE file f
 ## Support
 
 For questions, issues, or contributions:
-- GitHub Issues: https://github.com/kelaci/gaia/issues
-- Documentation: https://github.com/kelaci/gaia/tree/main/docs
+- GitHub Issues: https://github.com/kelaci/orthos/issues
+- Documentation: https://github.com/kelaci/orthos/tree/main/docs

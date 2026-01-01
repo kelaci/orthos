@@ -354,7 +354,7 @@ class MetaPlasticLinear(DiagnosticPlasticLinear):
     Extension with learnable plasticity parameters
     """
     
-    def __init__(self, in_features: int, out_features: int, cfg: GaiaConfig):
+    def __init__(self, in_features: int, out_features: int, cfg: OrthosConfig):
         super().__init__(in_features, out_features, cfg)
         
         # Meta-parameters (learnable)

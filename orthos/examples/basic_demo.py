@@ -20,7 +20,7 @@ def basic_demo():
     print("=" * 50)
 
     # Setup logging
-    logger = setup_logging('gaia_demo', 'INFO')
+    logger = setup_logging('orthos_demo', 'INFO')
     logger.info("Starting ORTHOS basic demo")
 
     # Create a simple hierarchy

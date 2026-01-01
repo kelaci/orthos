@@ -424,7 +424,7 @@ def run_experiment(
         'timestamp': datetime.now().isoformat(),
         'seed': seed,
         'num_trials': num_trials,
-        'gaia_version': get_gaia_version(),
+        'orthos_version': get_orthos_version(),
         'numpy_version': np.__version__,
         'python_version': sys.version
     }
@@ -528,7 +528,7 @@ class ExperimentTracker:
             'parameters': self.parameters,
             'metrics': self.metrics,
             'artifacts': self.artifacts,
-            'gaia_version': get_gaia_version(),
+            'orthos_version': get_orthos_version(),
             'environment': get_environment_info()
         }
 

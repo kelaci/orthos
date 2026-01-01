@@ -31,9 +31,9 @@ class UtilityBenchmark:
     
     def __init__(self):
         self.results: List[BenchmarkResult] = []
-        self.manager = self._setup_gaia_system()
+        self.manager = self._setup_orthos_system()
         
-    def _setup_gaia_system(self) -> HierarchyManager:
+    def _setup_orthos_system(self) -> HierarchyManager:
         """Initializes a standard ORTHOS hierarchy for testing."""
         manager = HierarchyManager()
         # Level 0: Fast Reactive

@@ -2239,7 +2239,7 @@ class DiagnosticPlasticLinear(nn.Module):
     - Comprehensive diagnostics
     """
     
-    def __init__(self, in_features: int, out_features: int, cfg: GaiaConfig):
+    def __init__(self, in_features: int, out_features: int, cfg: OrthosConfig):
         super().__init__()
         self.cfg = cfg
         
@@ -2339,11 +2339,11 @@ def forward(self, x: torch.Tensor) -> torch.Tensor:
 
 ## 2. Configuration System
 
-### 2.1 GaiaConfigEnhanced
+### 2.1 OrthosConfigEnhanced
 
 ```python
 @dataclass
-class GaiaConfigEnhanced:
+class OrthosConfigEnhanced:
     # === Core Dimensions ===
     state_dim: int = 1          # State space dimensionality
     action_dim: int = 1         # Action space dimensionality
@@ -2399,7 +2399,7 @@ class EnhancedDeepPlasticMember(nn.Module):
               → Linear (output)
     """
     
-    def __init__(self, cfg: GaiaConfigEnhanced):
+    def __init__(self, cfg: OrthosConfigEnhanced):
         super().__init__()
         inp = cfg.state_dim + cfg.action_dim
         h = cfg.hidden_dim
@@ -2451,7 +2451,7 @@ class EnhancedEnsembleWorldModel(nn.Module):
     - Mean prediction + disagreement-based uncertainty
     """
     
-    def __init__(self, cfg: GaiaConfigEnhanced):
+    def __init__(self, cfg: OrthosConfigEnhanced):
         super().__init__()
         self.models = nn.ModuleList(
             [EnhancedDeepPlasticMember(cfg) for _ in range(cfg.n_ensemble)]
@@ -2534,7 +2534,7 @@ def run_comprehensive_validation():
     Checkpoints at steps: 50, 100, 150, 200
     Metrics: WM Loss, Epistemic Uncertainty, Trace Norms, State
     """
-    agent = GaiaAgentEnhanced(cfg)
+    agent = OrthosAgentEnhanced(cfg)
     state = torch.tensor([[0.0]], device=device)
     
     for step in range(200):
@@ -2666,7 +2666,7 @@ Diagnostics:        ~8KB per layer (1000 × 2 floats)
 
 ```python
 # Configuration
-cfg = GaiaConfigEnhanced(
+cfg = OrthosConfigEnhanced(
     state_dim=4,
     action_dim=2,
     hidden_dim=128,
@@ -2674,7 +2674,7 @@ cfg = GaiaConfigEnhanced(
 )
 
 # Create agent
-agent = GaiaAgentEnhanced(cfg)
+agent = OrthosAgentEnhanced(cfg)
 
 # Training loop
 for episode in range(1000):
