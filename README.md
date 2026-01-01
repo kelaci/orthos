@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.1.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-4.2.0-blue.svg" alt="Version">
   <img src="https://img.shields.io/badge/python-3.8+-green.svg" alt="Python">
   <img src="https://img.shields.io/badge/license-MIT-purple.svg" alt="License">
   <img src="https://img.shields.io/badge/status-research--grade-orange.svg" alt="Status">
@@ -42,13 +42,16 @@ Whether you're a **neuroscience researcher**, **ML engineer**, or **curious stud
 │                     GAIA ARCHITECTURE                           │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
+│   🧠 Consensus Engine (New in v4.2)                             │
+│   └─ HierarchicalConsensus (Wisdom of Crowds Aggregation)      │
+│                                                                 │
 │   🎯 Meta-Learning Layer                                        │
 │   └─ PlasticityController (ES-based optimization)              │
 │                                                                 │
-│   📊 Hierarchical Processing                                    │
-│   ├─ Level 3: High-level concepts (8x temporal resolution)     │
-│   ├─ Level 2: Features & sequences (4x resolution)             │
-│   ├─ Level 1: Sensory features (2x resolution)                 │
+│   📊 Hierarchical Processing (Probabilistic)                    │
+│   ├─ Level 3: High-level + Kalman Filter (8x resolution)       │
+│   ├─ Level 2: Mid-level + Particle Filter (4x resolution)      │
+│   ├─ Level 1: Sensory features + EKF (2x resolution)           │
 │   └─ Level 0: Raw input (1x resolution)                        │
 │                                                                 │
 │   🧬 Core Layers                                                │
@@ -140,12 +143,29 @@ print(f"   Level 1: {len(representations[1])} representations")
 - **Task adaptation** - Learn optimal learning rates per task
 - **Performance tracking** - Comprehensive metrics and diagnostics
 
+### 🎲 Probabilistic Spine (New in v4.2)
+
+- **Kalman Filters** - Optimal estimation for linear/Gaussian states
+- **Particle Filters** - Sequential Monte Carlo for non-linear distributions
+- **Consensus Engine** - "Wisdom of Crowds" aggregation across hierarchy levels
+- **Uncertainty Quantification** - Bayesian tracking of system confidence
+
 ### 🔢 Advanced Features (PyTorch v3.1)
 
 - **BitNet Quantization** - 1.58-bit weights for efficient deployment
 - **Active Inference** - Free Energy Principle for action selection
 - **Ensemble Uncertainty** - Epistemic uncertainty estimation
 - **Dual-Timescale Traces** - Fast/slow memory consolidation
+
+### 🛡️ Robustness & Safety (New in v4.2)
+
+GAIA isn't just theory—it's built to survive. We benchmark against critical failure modes:
+
+- **Drone Saviour Protocol** 🚁: Prevents crashes during **GPS denial** or **motor failure** by instantly switching to optical flow/IMU fusion via the Probabilistic Spine.
+- **Chaos Resilience**: Maintains stability even when signal-to-noise ratio drops to critical levels.
+- **Lifelong Learning**: Adapts to new environments without catastrophic forgetting of previous tasks.
+
+👉 [Read the Research Utility Test Plan](docs/research/TEST_PLAN_UTILITY.md)
 
 ---
 
@@ -204,6 +224,7 @@ The documentation has been consolidated for efficiency:
 | [🔬 SCIENCE.md](SCIENCE.md) | Theoretical foundations, Active Inference, and research directions |
 | [📘 GUIDES.md](GUIDES.md) | Quickstart, GPU usage, validation, and PyTorch integration |
 | [🗺️ ROADMAP.md](ROADMAP.md) | Development roadmap and version milestones |
+| [📐 GAIA_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md](GAIA_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md) | **Comprehensive mathematical foundations with practical examples and GAIA advantages** |
 | [🤖 .agent/docs/README.md](.agent/docs/README.md) | **Onboarding & SOPs for AI Agents** |
 
 ---
@@ -354,6 +375,8 @@ python test_gaia.py
 | Meta-Learning | MetaOptimizer training |
 | Configuration | Default configs |
 | Integration | Full pipeline |
+| Probabilistic Spine (v4.2) | Kalman, Particle, Consensus |
+| Research Utility | Drone Saviour, Noise Resilience |
 
 ---
 
@@ -447,31 +470,34 @@ GAIA is built on foundational work from neuroscience and machine learning:
 
 ## 🗺️ Roadmap
 
-### Current: v4.1.0 ✅
+### Current: v4.2.0 ✅
 
+- [x] **Probabilistic Spine Integration**
+  - [x] Standard & Extended Kalman Filters
+  - [x] Particle Filters (SMC)
+  - [x] Outlier-robust Consensus Engine
 - [x] Core architecture with abstract base classes
 - [x] Multiple Hebbian learning rules
 - [x] Hierarchical processing system
 - [x] Evolutionary Strategy optimization
 - [x] Meta-learning framework
 - [x] Comprehensive documentation
-- [x] PyTorch v3.1 Protocol Integration (Prototype)
 
-### Coming: v4.2.0 🚧
+### Coming: v4.3.0 🚧
 
 - [ ] Advanced ES variants (CMA-ES, NES)
 - [ ] Attention mechanisms for hierarchy
 - [ ] Multi-objective optimization
 - [ ] GPU acceleration improvements
 
-### Future: v4.3.0+
+### Future: v4.4.0+
 
 - [ ] Neuroevolution of architectures
 - [ ] Reinforcement learning integration
 - [ ] Multi-modal processing
 - [ ] Production deployment tools
 
-See [Development Roadmap](docs/development/roadmap.md) for details.
+See [Development Roadmap](ROADMAP.md) for details.
 
 ---
 

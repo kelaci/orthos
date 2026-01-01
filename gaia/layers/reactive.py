@@ -10,33 +10,21 @@ import numpy as np
 from typing import Optional, Dict, Tuple, Any
 from gaia.core.base import Layer
 from gaia.core.types import Tensor, ActivationFunction
+from gaia.core.exceptions import InputShapeError, ConfigurationError
+from gaia.core.gpu_utils import (
+    get_array_module, get_device, zeros, dot, matmul,
+    CUPY_AVAILABLE
+)
 
-# Import GPU utilities (conditionally available)
-try:
-    from gaia.core.gpu_utils import (
-        get_array_module, get_device, zeros, dot, matmul,
-        CUPY_AVAILABLE
-    )
-    USING_GPU = get_device() == 'cuda'
-    # Define xp for array operations
-    if CUPY_AVAILABLE:
-        import cupy as xp
-    else:
-        import numpy as xp
-except ImportError:
-    import numpy as xp
-    zeros = lambda shape, **kwargs: np.zeros(shape, **kwargs)
-    dot = lambda a, b: np.dot(a, b)
-    matmul = lambda a, b: np.matmul(a, b)
-    CUPY_AVAILABLE = False
-    USING_GPU = False
+USING_GPU = get_device() == 'cuda'
+xp = get_array_module()
 
 class ReactiveLayer(Layer):
     """
     Fast, reactive processing layer with fixed weights for initial feature extraction.
 
     Supports GPU acceleration when CuPy is available.
-    
+
     Attributes:
         input_size: Size of input features
         output_size: Size of output features
@@ -89,7 +77,7 @@ class ReactiveLayer(Layer):
             self.weights = xp.random.uniform(-0.01, 0.01, 
                                             (self.output_size, self.input_size))
         else:
-            raise ValueError(f"Unknown init_type: {self.init_type}")
+            raise ConfigurationError(f"Unknown init_type: {self.init_type}")
 
     def forward(self, x: Tensor) -> Tensor:
         """
@@ -102,11 +90,11 @@ class ReactiveLayer(Layer):
             Output tensor (batch_size, output_size)
 
         Raises:
-            ValueError: If input shape doesn't match expected dimensions
+            InputShapeError: If input shape doesn't match expected dimensions
         """
         # Use GPU-accelerated dot operation
         if x.shape[1] != self.input_size:
-            raise ValueError(f"Input size mismatch: expected {self.input_size}, got {x.shape[1]}")
+            raise InputShapeError(f"Input size mismatch", expected=(None, self.input_size), actual=x.shape)
 
         # Linear transformation: y = x @ W + b
         output = dot(x, self.weights.T) + self.biases
@@ -123,7 +111,7 @@ class ReactiveLayer(Layer):
 
         Returns:
             Activated tensor
-            
+
         Raises:
             ValueError: If unknown activation function
         """
@@ -137,8 +125,6 @@ class ReactiveLayer(Layer):
             return x
         else:
             raise ValueError(f"Unknown activation: {self.activation_fn}")
-
-        return output
 
     def backward(self, grad: Tensor) -> Tensor:
         """
@@ -167,7 +153,7 @@ class ReactiveLayer(Layer):
         Update layer parameters.
 
         Note: ReactiveLayer has fixed weights - no update implemented.
-        
+
         Args:
             lr: Learning rate (ignored for this layer type)
         """
