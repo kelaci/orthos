@@ -710,7 +710,7 @@ This guide covers comprehensive validation procedures for ORTHOS systems, includ
 
 ```bash
 # Run the test suite
-python test_gaia.py
+python test_orthos.py
 
 # Expected output:
 # 🚀 Running ORTHOS v4/v4.1 Tests
@@ -1279,7 +1279,7 @@ jobs:
         pip install pytest pytest-cov
     
     - name: Run NumPy tests
-      run: python test_gaia.py
+      run: python test_orthos.py
     
     - name: Run PyTorch validation
       run: python -c "from gaia_protocol import run_comprehensive_validation; run_comprehensive_validation()"

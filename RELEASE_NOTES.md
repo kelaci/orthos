@@ -15,7 +15,7 @@ We are excited to announce **ORTHOS v5.0.0**, a major identity transformation th
 - **Migration Path**: Introduced `MIGRATION_GAIA_TO_ORTHOS.md` to assist current users.
 
 ### 3. 🧪 Validation
-- **Unified Test Suite**: `test_gaia.py` has been evolved into `test_orthos.py`.
+- **Unified Test Suite**: `test_orthos.py` has been evolved into `test_orthos.py`.
 - **Verified Stability**: Maintained 100% pass rate on all core and integration tests through the rebranding process.
 
 ### 4. 📖 Documentation Overhaul
@@ -25,14 +25,14 @@ We are excited to announce **ORTHOS v5.0.0**, a major identity transformation th
 ## ⚠️ Breaking Changes
 
 - **Import Namespaces**: All code previously importing from `gaia` must now import from `orthos`.
-- **File Names**: Several core scripts have been renamed (e.g., `run_gaia_v42.py` → `run_orthos_v42.py`).
+- **File Names**: Several core scripts have been renamed (e.g., `run_orthos_v42.py` → `run_orthos_v42.py`).
 
 ## 🛠️ Full Changelog
 
 - **Renamed**: `gaia/` directory to `orthos/`.
-- **Renamed**: `test_gaia.py` to `test_orthos.py`.
-- **Renamed**: `run_gaia_v42.py` to `run_orthos_v42.py`.
-- **Renamed**: `GAIA_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md` to `ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md`.
+- **Renamed**: `test_orthos.py` to `test_orthos.py`.
+- **Renamed**: `run_orthos_v42.py` to `run_orthos_v42.py`.
+- **Renamed**: `ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md` to `ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md`.
 - **Updated**: `pyproject.toml`, `setup.py`, and `requirements.txt`.
 - **Updated**: All docstrings, comments, and strings in Python files.
 - **Updated**: All Markdown headers and project descriptions.
@@ -63,7 +63,7 @@ We are proud to announce **ORTHOS v4.2.0**, featuring the **Probabilistic Spine*
 - **Emergency Handover**: Real-time switch from GPS to optical flow/IMU fusion via the Probabilistic Spine.
 
 ### 4. 📐 Mathematical Deep Dive
-- Released the [Comprehensive Mathematical Methods Deep Dive](GAIA_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md), detailing the Bayesian foundations of ORTHOS.
+- Released the [Comprehensive Mathematical Methods Deep Dive](ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md), detailing the Bayesian foundations of ORTHOS.
 
 ## 🛠️ Full Changelog
 

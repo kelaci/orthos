@@ -11,10 +11,10 @@ Follow these steps to add a new neural layer.
 4. Register the layer in `orthos/layers/__init__.py`.
 
 // turbo
-5. Add a test case to `test_gaia.py`. Use the existing `ReactiveLayer` test as a template.
+5. Add a test case to `test_orthos.py`. Use the existing `ReactiveLayer` test as a template.
 
 // turbo
 6. Run the test suite:
-   `python test_gaia.py`
+   `python test_orthos.py`
 
 7. Update `docs/architecture/overview.md` if the layer introduces a new architectural concept.

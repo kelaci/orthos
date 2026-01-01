@@ -45,11 +45,11 @@ find . -name "*.py" -exec sed -i 's/\bGAIA\b/ORTHOS/g' {} +
 ```
 
 ### 3. Update File References
-If you were using scripts like `run_gaia_v42.py`, they have been renamed:
+If you were using scripts like `run_orthos_v42.py`, they have been renamed:
 
-- `run_gaia_v42.py` → `run_orthos_v42.py`
-- `test_gaia.py` → `test_orthos.py`
-- `verify_critical_fixes.py` → `verify_orthos_fixes.py`
+- `run_orthos_v42.py` → `run_orthos_v42.py`
+- `test_orthos.py` → `test_orthos.py`
+- `verify_orthos_fixes.py` → `verify_orthos_fixes.py`
 
 ## ✨ What's New in ORTHOS?
 

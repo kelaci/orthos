@@ -39,9 +39,9 @@ If a logic block is used in two places, move it to `orthos/utils/` or `orthos/co
 
 Before any non-trivial change, follow this "Agent Test Loop":
 
-1.  **Baseline**: Run `python test_gaia.py` to ensure current state is green.
+1.  **Baseline**: Run `python test_orthos.py` to ensure current state is green.
 2.  **Implementation**: Make your changes.
-3.  **Local Test**: Create a temporary test script or add a case to `test_gaia.py`.
+3.  **Local Test**: Create a temporary test script or add a case to `test_orthos.py`.
 4.  **Verification**: Run the full suite again.
 5.  **Benchmark**: If you changed a core loop, run `python benchmark.py` to ensure no performance regression.
 
@@ -51,7 +51,7 @@ Before any non-trivial change, follow this "Agent Test Loop":
 1.  Inherit from `BaseLayer` in `orthos/core/base.py`.
 2.  Implement `forward`, `update`, and `reset`.
 3.  Add the layer to `orthos/layers/__init__.py`.
-4.  Add a test case in `test_gaia.py` under the `Layers` section.
+4.  Add a test case in `test_orthos.py` under the `Layers` section.
 
 ### Modifying Plasticity Rules
 1.  Locate the rule in `orthos/plasticity/rules.py`.

@@ -628,7 +628,7 @@ orthos/
 ├── 📄 README.md                 ← Main documentation
 ├── 📄 LICENSE                   ← MIT License
 ├── 📄 requirements.txt          ← Dependencies
-├── 📄 test_gaia.py              ← Test suite
+├── 📄 test_orthos.py              ← Test suite
 │
 ├── 📁 orthos/                     ← Main package
 │   ├── core/                    ← Base classes & types

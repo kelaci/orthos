@@ -1756,7 +1756,7 @@ cd orthos
 pip install -e .
 
 # Run v4.2 demo
-python run_gaia_v42.py
+python run_orthos_v42.py
 
 # Run v4.2 tests
 python -m pytest tests/integration/test_consolidation_improvements.py -v

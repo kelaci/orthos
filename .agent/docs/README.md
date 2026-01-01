@@ -7,7 +7,7 @@ Welcome, Agent. This repository, **ORTHOS (Orthogonal Recursive Hierarchical Opt
 Your goal is to assist in the research and development of ORTHOS while maintaining:
 1.  **Mathematical Integrity**: Ensure all learning rules and temporal transformations are mathematically sound.
 2.  **Code Quality**: Follow strict typing, docstring standards, and modular design.
-3.  **Test Coverage**: Never commit code without corresponding tests in `test_gaia.py`.
+3.  **Test Coverage**: Never commit code without corresponding tests in `test_orthos.py`.
 4.  **Documentation Sync**: Update architectural docs whenever a core component changes.
 
 ## 🗺️ Quick Navigation for Agents
@@ -18,7 +18,7 @@ Your goal is to assist in the research and development of ORTHOS while maintaini
 | `orthos/layers/` | Core neural blocks | Where the "work" happens (Hebbian, Temporal, etc). |
 | `orthos/hierarchy/` | Level management | How layers are stacked and time-scaled. |
 | `orthos/plasticity/` | Learning logic | The brain of the adaptation system. |
-| `test_gaia.py` | Central test suite | Your safety net. Run this before every PR. |
+| `test_orthos.py` | Central test suite | Your safety net. Run this before every PR. |
 | `.agent/docs/` | Agent-specific docs | Detailed guides on how to work as an AI in this repo. |
 
 ## 🛠️ Essential Commands for Agents
@@ -27,7 +27,7 @@ Run these to get your bearings:
 
 ```bash
 # Verify the current state of the project
-python test_gaia.py
+python test_orthos.py
 
 # Run benchmarks to check performance
 python benchmark.py
