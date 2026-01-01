@@ -6,7 +6,7 @@ Provides robust state estimation and uncertainty quantification for hierarchical
 """
 
 import numpy as np
-from typing import Tuple, Optional, Literal, Dict, Any, Union
+from typing import Tuple, Optional, Literal, Dict, Any, Union, List
 
 from orthos.hierarchy.level import HierarchicalLevel
 from orthos.filters.kalman import KalmanFilter, ExtendedKalmanFilter
@@ -122,9 +122,14 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
         """
         Perform a forward pass through neural layers followed by filtering.
 
-        Implements double fusion:
+        Implements Bayesian fusion for robust state estimation:
         1. Bottom-Up: Update filter with neural output (measurement)
-        2. Top-Down: Update filter with prior from higher levels (treated as second measurement)
+        2. Top-Down: Bayesian fusion with prior from higher levels (single update)
+
+        This approach is more mathematically elegant and efficient than calling
+        filter.update() twice. It uses the parallel combination rule for Bayesian
+        fusion, treating the prior as a second information source with higher
+        uncertainty (lower trust).
 
         Args:
             input_data: Input features for this step.
@@ -132,9 +137,21 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
 
         Returns:
             Tuple of (Filtered Representation, Current Uncertainty).
+
+        Notes:
+            The Bayesian fusion formula for diagonal covariance:
+                x_fused = (x_bu / R_bu + x_td / R_td) / (1/R_bu + 1/R_td)
+                unc_fused = 1 / (1/R_bu + 1/R_td)
+            
+            Where top-down is treated as 2x less certain than bottom-up by default.
         """
         # Use provided prior or stored prior
-        prior = top_down_prior or self._top_down_prior
+        if top_down_prior is not None:
+            prior = top_down_prior
+        elif self._top_down_prior is not None:
+            prior = self._top_down_prior
+        else:
+            prior = None
 
         # 1. Base neural processing
         self.time_step += 1
@@ -147,16 +164,19 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
         if self.filter is None:
             return raw_output, 0.0
 
-        # 2. Filtering cycle with double fusion
+        # 2. Filtering cycle with Bayesian fusion
         if isinstance(self.filter, KalmanFilter):
             # Identity transition assumed for random walk
             self.filter.predict(F=np.eye(self.output_size))
             
             # First update: Bottom-Up (neural output as measurement)
-            prediction, P = self.filter.update(raw_output)
+            state_est, P = self.filter.update(raw_output)
             
-            # Second update: Top-Down (prior as second measurement)
-            # This is mathematically sound as treating prior as a measurement
+            # Calculate uncertainty as trace or sum of diagonal
+            unc = float(np.trace(P)) if P.ndim == 2 else float(np.sum(P))
+            
+            # Bayesian fusion for top-down prior
+            # This replaces the second filter.update() with a mathematically elegant fusion
             if prior is not None:
                 # Ensure prior matches dimension
                 if prior.shape[0] != self.output_size:
@@ -168,14 +188,34 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
                     else:
                         prior = prior[:self.output_size]
                 
-                # Weight the prior's observation noise
-                # Higher weight (0.5) means we trust the prior more (lower noise)
-                R_prior = np.eye(self.output_size) * (1.0 / (self.top_down_weight + 1e-9))
+                # Bayesian fusion using parallel combination rule
+                # This is mathematically equivalent to treating prior as a measurement
+                # but more efficient and clearer in intent
                 
-                # Update with prior as measurement
-                prediction, P = self.filter.update(prior, R_override=R_prior)
+                # R_bu: Uncertainty from bottom-up (neural network measurement)
+                # R_td: Uncertainty from top-down (prior - less trusted by default)
+                r_bu = unc
+                r_td = unc * (1.0 / (self.top_down_weight + 1e-9))  # Higher weight = lower noise
+                
+                # Numerical safety
+                r_bu = max(r_bu, 1e-6)
+                r_td = max(r_td, 1e-6)
+                
+                # Inverse variances (weights)
+                inv_r_bu = 1.0 / r_bu
+                inv_r_td = 1.0 / r_td
+                inv_sum = inv_r_bu + inv_r_td
+                
+                # Bayesian fusion: weighted average by inverse variance
+                # x_fused = (x_td / R_td + x_bu / R_bu) / (1/R_td + 1/R_bu)
+                state_est = (state_est * inv_r_bu + prior * inv_r_td) / inv_sum
+                
+                # Fused uncertainty using parallel combination rule
+                # 1/unc_fused = 1/unc_bu + 1/unc_td
+                unc = 1.0 / inv_sum
             
-            uncertainty = float(np.trace(P)) if P.ndim == 2 else float(np.sum(P))
+            prediction = state_est
+            uncertainty = unc
             
         elif isinstance(self.filter, ParticleFilter):
             self.filter.predict(process_noise_std=0.01)

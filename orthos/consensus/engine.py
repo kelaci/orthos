@@ -160,8 +160,11 @@ class HierarchicalConsensus(Module):
             elif method == 'median':
                 final_pred = np.median(valid_preds, axis=0)
             elif method == 'weighted_vote':
-                # Weight by confidence
-                weights = valid_confs / (np.sum(valid_confs) + 1e-9)
+                # Weight by uncertainty (inverse variance) - mathematically superior
+                # for Bayesian fusion with Kalman filters
+                # Lower uncertainty = higher weight = more trusted prediction
+                weights = 1.0 / (valid_uncs + 1e-6)
+                weights /= np.sum(weights)  # Normalize weights
                 final_pred = np.average(valid_preds, axis=0, weights=weights)
             else:
                 final_pred = np.mean(valid_preds, axis=0)

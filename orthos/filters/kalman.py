@@ -144,6 +144,11 @@ class KalmanFilter(Module):
         """
         Perform update step (Measurement Update).
 
+        This method implements the Kalman filter measurement update with full support
+        for both diagonal and full covariance matrices. For diagonal covariance (O(N)),
+        it uses element-wise operations for maximum efficiency with high-dimensional
+        state spaces (e.g., 256+ dimensions).
+
         Args:
             z: Observation vector.
             H: Observation matrix (default: Identity mapping state to obs).
@@ -151,6 +156,9 @@ class KalmanFilter(Module):
 
         Returns:
             Tuple of (Updated State x, Updated Covariance P).
+
+        Raises:
+            ValueError: If observation dimension mismatch.
         """
         if H is None:
             # Assume 1-to-1 observation of first obs_dim states
@@ -164,6 +172,65 @@ class KalmanFilter(Module):
         else:
             R = np.maximum(R, np.eye(R.shape[0]) * self.min_obs_noise)
 
+        # Optimization: Fully diagonal update for O(N) performance
+        # Only applies when H is identity and dimensions match
+        if self.use_diagonal_covariance and np.array_equal(H, np.eye(self.state_dim)):
+            # TRULY DIAGONAL UPDATE - O(N) instead of O(N³)
+            # This is the critical optimization for high-dimensional systems
+            
+            # Innovation: y = z - x
+            y = z - self.x
+            
+            # Innovation covariance: S = P + R (element-wise)
+            S = self.P + R
+            
+            # Numerical safety: prevent division by zero
+            S_safe = np.maximum(S, 1e-6)
+            
+            # Kalman gain: K = P / S (element-wise division)
+            K = self.P / S_safe
+            
+            # State update: x = x + K * y
+            self.x += K * y
+            
+            # Covariance update: P = (I - K) * P
+            # For diagonal: P_new = (1 - K) * P_old (element-wise)
+            self.P = (1.0 - K) * self.P
+            
+            # Floor value: prevent filter "lock-up" by maintaining minimum uncertainty
+            # This ensures the filter remains responsive to new measurements
+            self.P = np.maximum(self.P, self.min_obs_noise)
+            
+            # Adaptive noise estimation if enabled
+            if self.adaptive:
+                # Use diagonal-friendly adaptive noise
+                self._adapt_noise_diagonal(y, S)
+            
+            return self.x, self.P
+        
+        # Standard update for general case (or full covariance)
+        return self._update_standard(z, H, R)
+
+    def _update_standard(
+        self,
+        z: np.ndarray,
+        H: np.ndarray,
+        R: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Standard Kalman filter update for non-identity observation matrices.
+        
+        This method implements the full Kalman filter update equations with O(N³)
+        complexity. Used when H is not identity or full covariance is required.
+
+        Args:
+            z: Observation vector.
+            H: Observation matrix.
+            R: Observation noise covariance.
+
+        Returns:
+            Tuple of (Updated State x, Updated Covariance P).
+        """
         # y = z - Hx (Innovation)
         y = z - H @ self.x
 
@@ -223,6 +290,38 @@ class KalmanFilter(Module):
             self._adapt_noise(y, S)
 
         return self.x, self.P
+
+    def _adapt_noise_diagonal(
+        self,
+        y: np.ndarray,
+        S: np.ndarray
+    ) -> None:
+        """
+        Adapt observation noise R based on innovation (diagonal version).
+        
+        This implements adaptive noise estimation where R is updated based on
+        the magnitude of innovations. Uses element-wise operations for efficiency.
+
+        Args:
+            y: Innovation vector (z - x').
+            S: Innovation covariance (diagonal).
+        """
+        innovation_sq = float(np.dot(y, y))
+        trace_S = float(np.sum(S))
+        
+        # Adaptation rate (alpha)
+        alpha = 0.1
+        
+        if innovation_sq > 5.0 * trace_S:
+            # Innovation is large - increase observation noise (decrease trust in measurements)
+            self.R *= 1.1
+        else:
+            # Innovation is small - decrease observation noise (increase trust in measurements)
+            self.R *= 0.99
+        
+        # CRITICAL: Enforce minimum observation noise floor to prevent filter lock-up
+        # This ensures the filter always remains responsive to new measurements
+        self.R = np.maximum(self.R, self.min_obs_noise)
 
     def _adapt_noise(self, y: np.ndarray, S: np.ndarray) -> None:
         """
