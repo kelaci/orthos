@@ -24,6 +24,7 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
         filter_type (str): Type of filter ('kalman', 'ekf', 'particle', 'none').
         filter (Optional[Union[KalmanFilter, ParticleFilter]]): The filter instance.
         uncertainty_history (List[float]): History of uncertainty estimates.
+        _top_down_prior (Optional[np.ndarray]): Prior from higher-level consensus.
     """
 
     def __init__(
@@ -36,6 +37,10 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
         process_noise: float = 0.01,
         obs_noise: float = 0.1,
         adaptive_noise: bool = False,
+        use_diagonal_covariance: bool = None,
+        min_obs_noise: float = 1e-6,
+        use_joseph_form: bool = False,
+        top_down_weight: float = 0.5,
         **kwargs: Any
     ):
         """
@@ -50,12 +55,18 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
             process_noise: Estimated variance of the state dynamics.
             obs_noise: Estimated variance of the observations.
             adaptive_noise: Enable online noise adaptation if supported.
+            use_diagonal_covariance: Use diagonal covariance for high dimensions.
+            min_obs_noise: Minimum threshold for observation noise.
+            use_joseph_form: Use Joseph form for numerical stability.
+            top_down_weight: Weight for top-down prior fusion (0-1).
             **kwargs: Additional parameters for the base level.
         """
         super().__init__(level_id, input_size, output_size, temporal_resolution)
 
         self.filter_type = filter_type
         self.filter: Optional[Union[KalmanFilter, ParticleFilter]] = None
+        self.top_down_weight = top_down_weight
+        self._top_down_prior: Optional[np.ndarray] = None
 
         # Initialize Filter based on type
         if filter_type == 'kalman':
@@ -64,7 +75,10 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
                 obs_dim=output_size,
                 process_noise=process_noise,
                 obs_noise=obs_noise,
-                adaptive=adaptive_noise
+                adaptive=adaptive_noise,
+                use_diagonal_covariance=use_diagonal_covariance,
+                min_obs_noise=min_obs_noise,
+                use_joseph_form=use_joseph_form
             )
         elif filter_type == 'ekf':
             self.filter = ExtendedKalmanFilter(
@@ -73,7 +87,11 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
                 dynamics_fn=lambda x, u: x,  # Default to Random Walk
                 observation_fn=lambda x: x,
                 process_noise=process_noise,
-                obs_noise=obs_noise
+                obs_noise=obs_noise,
+                adaptive=adaptive_noise,
+                use_diagonal_covariance=use_diagonal_covariance,
+                min_obs_noise=min_obs_noise,
+                use_joseph_form=use_joseph_form
             )
         elif filter_type == 'particle':
             self.filter = ParticleFilter(
@@ -87,6 +105,15 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
 
         self.uncertainty_history: List[float] = []
 
+    def set_top_down_prior(self, prior: np.ndarray) -> None:
+        """
+        Set a top-down prior from higher-level consensus.
+
+        Args:
+            prior: Prior vector from higher levels.
+        """
+        self._top_down_prior = prior
+
     def forward_filtered(
         self,
         input_data: np.ndarray,
@@ -95,13 +122,20 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
         """
         Perform a forward pass through neural layers followed by filtering.
 
+        Implements double fusion:
+        1. Bottom-Up: Update filter with neural output (measurement)
+        2. Top-Down: Update filter with prior from higher levels (treated as second measurement)
+
         Args:
             input_data: Input features for this step.
-            top_down_prior: Optional prior from higher levels (unused currently).
+            top_down_prior: Optional prior from higher levels.
 
         Returns:
             Tuple of (Filtered Representation, Current Uncertainty).
         """
+        # Use provided prior or stored prior
+        prior = top_down_prior or self._top_down_prior
+
         # 1. Base neural processing
         self.time_step += 1
         raw_output = super().process_time_step(input_data, self.time_step)
@@ -113,16 +147,48 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
         if self.filter is None:
             return raw_output, 0.0
 
-        # 2. Filtering cycle
-        # We perform prediction and update cycle
+        # 2. Filtering cycle with double fusion
         if isinstance(self.filter, KalmanFilter):
             # Identity transition assumed for random walk
             self.filter.predict(F=np.eye(self.output_size))
+            
+            # First update: Bottom-Up (neural output as measurement)
             prediction, P = self.filter.update(raw_output)
-            uncertainty = float(np.trace(P))
+            
+            # Second update: Top-Down (prior as second measurement)
+            # This is mathematically sound as treating prior as a measurement
+            if prior is not None:
+                # Ensure prior matches dimension
+                if prior.shape[0] != self.output_size:
+                    # Simple projection: repeat or truncate
+                    if prior.shape[0] < self.output_size:
+                        prior_repeated = np.repeat(prior, 
+                            (self.output_size + prior.shape[0] - 1) // prior.shape[0])[:self.output_size]
+                        prior = prior_repeated
+                    else:
+                        prior = prior[:self.output_size]
+                
+                # Weight the prior's observation noise
+                # Higher weight (0.5) means we trust the prior more (lower noise)
+                R_prior = np.eye(self.output_size) * (1.0 / (self.top_down_weight + 1e-9))
+                
+                # Update with prior as measurement
+                prediction, P = self.filter.update(prior, R_override=R_prior)
+            
+            uncertainty = float(np.trace(P)) if P.ndim == 2 else float(np.sum(P))
+            
         elif isinstance(self.filter, ParticleFilter):
             self.filter.predict(process_noise_std=0.01)
             self.filter.update(raw_output)
+            
+            # For particle filter, incorporate prior by adjusting weights
+            if prior is not None:
+                # Incorporate prior into particle weights
+                particles = self.filter.particles
+                prior_likelihood = np.exp(-0.5 * np.sum((prior - particles)**2, axis=1))
+                self.filter.weights *= prior_likelihood
+                self.filter.weights /= np.sum(self.filter.weights) + 1e-10
+            
             prediction = self.filter.get_mean()
             uncertainty = self.filter.get_uncertainty()
         else:
@@ -151,3 +217,4 @@ class FilteredHierarchicalLevel(HierarchicalLevel):
         if self.filter:
             self.filter.reset_state()
         self.uncertainty_history = []
+        self._top_down_prior = None

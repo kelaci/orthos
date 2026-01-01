@@ -144,6 +144,87 @@ def check_input(data):
         raise Exception("Bad input")
 ```
 
+### 2.6 Minimizing Conditional Logic
+
+To improve readability and maintainability, avoid excessive `if-elif-else` blocks and deep nesting.
+
+#### 2.6.1 Dictionary Mapping (Dispatch Table)
+Use dictionaries to map keys to functions instead of multiple `elif` statements.
+
+```python
+# ✅ GOOD: Dictionary mapping
+def process_filter_step(filter_type: str, data: np.ndarray):
+    handlers = {
+        'kalman': handle_kalman,
+        'particle': handle_particle,
+        'unscented': handle_ukf
+    }
+    handler = handlers.get(filter_type, handle_default)
+    return handler(data)
+
+# ❌ BAD: If-elif chain
+def process_filter_step(filter_type: str, data: np.ndarray):
+    if filter_type == 'kalman':
+        return handle_kalman(data)
+    elif filter_type == 'particle':
+        return handle_particle(data)
+    # ...
+```
+
+#### 2.6.2 Structural Pattern Matching (Python 3.10+)
+Use `match-case` for complex data structures or multiple conditions.
+
+```python
+# ✅ GOOD: Match-case pattern
+def handle_msg(msg: Dict[str, Any]):
+    match msg:
+        case {"status": "error", "code": code}:
+            log_error(code)
+        case {"status": "success", "data": data}:
+            process_data(data)
+        case _:
+            handle_unknown()
+```
+
+#### 2.6.3 Guard Clauses (Early Return)
+Handle exceptions and edge cases early to keep the "happy path" unindented.
+
+```python
+# ✅ GOOD: Guard clauses
+def train_layer(layer, data):
+    if not layer.is_ready:
+        return
+    if data is None:
+        raise ValueError("No data")
+    
+    # Happy path is flat
+    layer.update(data)
+
+# ❌ BAD: Nested if
+def train_layer(layer, data):
+    if layer.is_ready:
+        if data is not None:
+            layer.update(data)
+        else:
+            raise ValueError("No data")
+```
+
+#### 2.6.4 Polymorphism
+Replace `isinstance` checks with polymorphic method calls.
+
+```python
+# ✅ GOOD: Polymorphism
+for module in modules:
+    module.process() # Each subclass implements its own process()
+
+# ❌ BAD: Type checking
+for module in modules:
+    if isinstance(module, KalmanFilter):
+        module.update_kf()
+    elif isinstance(module, ParticleFilter):
+        module.update_pf()
+```
+
 ---
 
 ## 📝 Documentation Standards
@@ -760,6 +841,7 @@ jobs:
 | 1.0 | 2026-01-01 | Initial coding standard for GAIA v4.1 |
 | 1.1 | 2026-01-15 | Added research-specific best practices |
 | 1.2 | 2026-02-01 | Updated testing requirements |
+| 1.3 | 2026-01-01 | Added Section 2.6 on minimizing conditional logic |
 
 ---
 

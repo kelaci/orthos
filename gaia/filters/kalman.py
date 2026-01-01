@@ -44,7 +44,10 @@ class KalmanFilter(Module):
         obs_dim: int,
         process_noise: float = 0.01,
         obs_noise: float = 0.1,
-        adaptive: bool = False
+        adaptive: bool = False,
+        use_diagonal_covariance: bool = None,
+        min_obs_noise: float = 1e-6,
+        use_joseph_form: bool = False
     ):
         """
         Initialize Kalman Filter.
@@ -55,26 +58,48 @@ class KalmanFilter(Module):
             process_noise: Initial variance for process noise Q (identity scale).
             obs_noise: Initial variance for observation noise R (identity scale).
             adaptive: Whether to adapt Q based on innovation magnitude (simple heuristic).
+            use_diagonal_covariance: If True, use diagonal covariance approximation (faster for high dimensions).
+                                     If None, automatically use diagonal when state_dim > 64.
+            min_obs_noise: Minimum threshold for observation noise R (prevents overconfidence).
+            use_joseph_form: If True, use Joseph form for covariance update (numerically stable).
         """
         self.state_dim = state_dim
         self.obs_dim = obs_dim
         self.adaptive = adaptive
+        self.min_obs_noise = min_obs_noise
+        self.use_joseph_form = use_joseph_form
+        
+        # Auto-select diagonal covariance for high dimensions (>64)
+        if use_diagonal_covariance is None:
+            self.use_diagonal_covariance = state_dim > 64
+        else:
+            self.use_diagonal_covariance = use_diagonal_covariance
 
         # State (Mean) and Covariance
         self.x: np.ndarray = np.zeros(state_dim)
-        self.P: np.ndarray = np.eye(state_dim) * 1.0  # Initial uncertainty
+        if self.use_diagonal_covariance:
+            self.P: np.ndarray = np.ones(state_dim) * 1.0  # Diagonal as 1D array
+        else:
+            self.P: np.ndarray = np.eye(state_dim) * 1.0  # Full covariance matrix
 
         # Noise Covariances
-        self.Q: np.ndarray = np.eye(state_dim) * process_noise
-        self.R: np.ndarray = np.eye(obs_dim) * obs_noise
+        if self.use_diagonal_covariance:
+            self.Q: np.ndarray = np.ones(state_dim) * process_noise
+            self.R: np.ndarray = np.ones(obs_dim) * obs_noise
+        else:
+            self.Q: np.ndarray = np.eye(state_dim) * process_noise
+            self.R: np.ndarray = np.eye(obs_dim) * obs_noise
 
-        # Identity matrix cache
+        # Identity matrix cache (only needed for full covariance)
         self.I: np.ndarray = np.eye(state_dim)
 
     def reset_state(self) -> None:
         """Reset state and covariance to initial conditions."""
         self.x = np.zeros(self.state_dim)
-        self.P = np.eye(self.state_dim) * 1.0
+        if self.use_diagonal_covariance:
+            self.P = np.ones(self.state_dim) * 1.0
+        else:
+            self.P = np.eye(self.state_dim) * 1.0
 
     def predict(
         self,
@@ -100,7 +125,15 @@ class KalmanFilter(Module):
             self.x += B @ u
 
         # P = FPF' + Q
-        self.P = F @ self.P @ F.T + self.Q
+        if self.use_diagonal_covariance:
+            # For diagonal covariance, simplify: P[i] = sum_j F[i,j]^2 * P[j] + Q[i]
+            # Assuming diagonal Q and ignoring cross-terms for efficiency
+            P_new = np.zeros_like(self.P)
+            for i in range(self.state_dim):
+                P_new[i] = np.sum(F[i, :] ** 2 * self.P) + self.Q[i]
+            self.P = P_new
+        else:
+            self.P = F @ self.P @ F.T + self.Q
 
     def update(
         self,
@@ -124,25 +157,59 @@ class KalmanFilter(Module):
             H = np.eye(self.obs_dim, self.state_dim)
 
         R = R_override if R_override is not None else self.R
+        
+        # Enforce minimum observation noise to prevent overconfidence
+        if self.use_diagonal_covariance:
+            R = np.maximum(R, self.min_obs_noise)
+        else:
+            R = np.maximum(R, np.eye(R.shape[0]) * self.min_obs_noise)
 
         # y = z - Hx (Innovation)
         y = z - H @ self.x
 
         # S = HP'H' + R
-        S = H @ self.P @ H.T + R
+        if self.use_diagonal_covariance:
+            # Simplified for diagonal P and R
+            S = np.diag(H @ np.diag(self.P) @ H.T) + R
+        else:
+            S = H @ self.P @ H.T + R
 
         # K = P'H' inv(S) (Kalman Gain)
         try:
-            K = self.P @ H.T @ np.linalg.inv(S)
+            if self.use_diagonal_covariance:
+                # Simplified Kalman gain for diagonal case
+                K = np.diag(self.P) @ H.T @ np.linalg.inv(S)
+            else:
+                K = self.P @ H.T @ np.linalg.inv(S)
         except np.linalg.LinAlgError:
             # Fallback for singular matrix using Pseudo-inverse
-            K = self.P @ H.T @ np.linalg.pinv(S)
+            if self.use_diagonal_covariance:
+                K = np.diag(self.P) @ H.T @ np.linalg.pinv(S)
+            else:
+                K = self.P @ H.T @ np.linalg.pinv(S)
 
         # x = x' + Ky
         self.x = self.x + K @ y
 
-        # P = (I - KH)P'
-        self.P = (self.I - K @ H) @ self.P
+        # P = (I - KH)P'  (or Joseph form for numerical stability)
+        if self.use_joseph_form:
+            # Joseph form: P = (I-KH)P'(I-KH)' + KRK'
+            # Numerically more stable, guarantees positive semi-definite P
+            KH = K @ H
+            IKH = self.I - KH
+            if self.use_diagonal_covariance:
+                # For diagonal case, simplify
+                self.P = np.diag(np.diag(IKH) ** 2 * self.P + np.diag(K @ np.diag(R) @ K.T))
+            else:
+                self.P = IKH @ self.P @ IKH.T + K @ R @ K.T
+        else:
+            # Standard form (faster)
+            if self.use_diagonal_covariance:
+                # Simplified for diagonal covariance
+                KH = K @ H
+                self.P = np.diag((1 - np.diag(KH)) * self.P)
+            else:
+                self.P = (self.I - K @ H) @ self.P
 
         if self.adaptive:
             self._adapt_noise(y, S)
@@ -158,8 +225,15 @@ class KalmanFilter(Module):
             S: Innovation covariance.
         """
         innovation_sq = float(np.dot(y, y))
-        if innovation_sq > 5.0 * np.trace(S):
+        if self.use_diagonal_covariance:
+            trace_S = float(np.sum(S))
+        else:
+            trace_S = float(np.trace(S))
+            
+        if innovation_sq > 5.0 * trace_S:
             self.Q *= 1.1
+            # Ensure minimum noise threshold
+            self.Q = np.maximum(self.Q, self.min_obs_noise)
         else:
             self.Q *= 0.99
 
@@ -220,7 +294,10 @@ class ExtendedKalmanFilter(KalmanFilter):
         observation_fn: Callable[[np.ndarray], np.ndarray],
         process_noise: float = 0.01,
         obs_noise: float = 0.1,
-        adaptive: bool = False
+        adaptive: bool = False,
+        use_diagonal_covariance: bool = None,
+        min_obs_noise: float = 1e-6,
+        use_joseph_form: bool = False
     ):
         """
         Initialize EKF.
@@ -233,8 +310,14 @@ class ExtendedKalmanFilter(KalmanFilter):
             process_noise: Initial Q scale.
             obs_noise: Initial R scale.
             adaptive: Enable adaptive Q.
+            use_diagonal_covariance: If True, use diagonal covariance approximation.
+            min_obs_noise: Minimum threshold for observation noise.
+            use_joseph_form: If True, use Joseph form for covariance update.
         """
-        super().__init__(state_dim, obs_dim, process_noise, obs_noise, adaptive)
+        super().__init__(
+            state_dim, obs_dim, process_noise, obs_noise, adaptive,
+            use_diagonal_covariance, min_obs_noise, use_joseph_form
+        )
         self.dynamics_fn = dynamics_fn
         self.observation_fn = observation_fn
 
@@ -262,4 +345,11 @@ class ExtendedKalmanFilter(KalmanFilter):
         self.x = self.dynamics_fn(self.x, u)
 
         # 2. Propagate covariance using Jacobian F: P = FPF' + Q
-        self.P = F @ self.P @ F.T + self.Q
+        if self.use_diagonal_covariance:
+            # Simplified for diagonal covariance
+            P_new = np.zeros_like(self.P)
+            for i in range(self.state_dim):
+                P_new[i] = np.sum(F[i, :] ** 2 * self.P) + self.Q[i]
+            self.P = P_new
+        else:
+            self.P = F @ self.P @ F.T + self.Q

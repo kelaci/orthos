@@ -26,7 +26,8 @@ class ConsensusHierarchyManager(HierarchyManager):
         consensus_method: str = 'weighted_vote',
         outlier_threshold: float = 3.0,
         min_agreement: float = 0.6,
-        use_temporal_weighting: bool = False
+        use_temporal_weighting: bool = False,
+        auto_projection: bool = False
     ):
         """
         Initialize ConsensusHierarchyManager.
@@ -36,6 +37,7 @@ class ConsensusHierarchyManager(HierarchyManager):
             outlier_threshold: Robust Z-score threshold for outlier detection.
             min_agreement: Minimum agreement score to consider hierarchy stable.
             use_temporal_weighting: Enable temporal smoothing of consensus.
+            auto_projection: Automatically project lower-dimensional outputs to higher dimensions.
         """
         super().__init__()
         self.consensus_engine = HierarchicalConsensus(
@@ -45,6 +47,73 @@ class ConsensusHierarchyManager(HierarchyManager):
         )
         self.consensus_method = consensus_method
         self.consensus_history: List[ConsensusResult] = []
+        self.auto_projection = auto_projection
+        self.consensus_prior: Optional[np.ndarray] = None
+
+    def _validate_dimensions(self, level_predictions: List[LevelPrediction]) -> Tuple[int, bool]:
+        """
+        Validate that all level predictions have compatible dimensions.
+
+        Args:
+            level_predictions: List of level predictions to validate.
+
+        Returns:
+            Tuple of (target_dimension, is_valid).
+
+        Raises:
+            ValueError: If dimensions are incompatible and auto_projection is disabled.
+        """
+        if not level_predictions:
+            raise ValueError("No level predictions provided")
+
+        dimensions = [pred.prediction.shape[0] if pred.prediction.ndim > 0 else len(pred.prediction) 
+                     for pred in level_predictions]
+        unique_dims = set(dimensions)
+
+        if len(unique_dims) == 1:
+            return unique_dims.pop(), True
+        elif self.auto_projection:
+            # Project all to the maximum dimension
+            target_dim = max(unique_dims)
+            return target_dim, False
+        else:
+            raise ValueError(
+                f"Level output dimensions are incompatible: {unique_dims}. "
+                f"Either ensure all levels output the same dimension or enable auto_projection=True."
+            )
+
+    def _project_prediction(
+        self,
+        prediction: np.ndarray,
+        target_dim: int
+    ) -> np.ndarray:
+        """
+        Project a prediction to the target dimension.
+
+        Args:
+            prediction: Original prediction vector.
+            target_dim: Target dimension.
+
+        Returns:
+            Projected prediction vector.
+        """
+        current_dim = prediction.shape[0] if prediction.ndim > 0 else len(prediction)
+        
+        if current_dim == target_dim:
+            return prediction
+        elif current_dim < target_dim:
+            # Upsample with repetition (simple but effective for many cases)
+            repetition = target_dim // current_dim
+            remainder = target_dim % current_dim
+            projected = np.tile(prediction, repetition)
+            if remainder > 0:
+                projected = np.concatenate([projected, prediction[:remainder]])
+            return projected
+        else:
+            # Downsample by taking every nth element
+            step = current_dim // target_dim
+            projected = prediction[::step][:target_dim]
+            return projected
 
     def get_consensus_prediction(
         self,
@@ -86,14 +155,52 @@ class ConsensusHierarchyManager(HierarchyManager):
                 uncertainty=float(unc)
             ))
 
+        # Validate and project dimensions if needed
+        target_dim, is_valid = self._validate_dimensions(level_predictions)
+        if not is_valid:
+            # Project all predictions to target dimension
+            for pred in level_predictions:
+                pred.prediction = self._project_prediction(pred.prediction, target_dim)
+
         # Aggregate using consensus engine
-        # We use the aggregate method directly
         result = self.consensus_engine.aggregate(level_predictions, method=method) # type: ignore
+        
+        # Store as prior for next iteration (top-down feedback)
+        self.consensus_prior = result.aggregated_prediction
         
         self.consensus_history.append(result)
         self.global_time_step += 1
 
         return result
+
+    def distribute_prior(self, levels: List[HierarchicalLevel]) -> None:
+        """
+        Distribute the consensus result back to lower levels as a top-down prior.
+
+        This enables the feedback loop where high-level consensus influences
+        lower-level processing in the next timestep.
+
+        Args:
+            levels: List of HierarchicalLevel objects to receive the prior.
+        """
+        if self.consensus_prior is None:
+            return
+
+        for level_obj in levels:
+            # Check if level accepts top-down priors
+            if hasattr(level_obj, 'set_top_down_prior'):
+                # Project prior to the level's output dimension if needed
+                level_dim = getattr(level_obj, 'output_size', None)
+                if level_dim is not None:
+                    prior_projected = self._project_prediction(self.consensus_prior, level_dim)
+                    level_obj.set_top_down_prior(prior_projected)
+            elif hasattr(level_obj, 'forward_filtered'):
+                # For FilteredHierarchicalLevel, pass as top_down_prior parameter
+                # Store it as an attribute that will be used in next forward_filtered call
+                level_obj._top_down_prior = self._project_prediction(
+                    self.consensus_prior,
+                    getattr(level_obj, 'output_size', self.consensus_prior.shape[0])
+                )
 
     def is_hierarchy_stable(self) -> bool:
         """
@@ -114,3 +221,4 @@ class ConsensusHierarchyManager(HierarchyManager):
         super().reset_state()
         self.consensus_history = []
         self.consensus_engine.reset_state()
+        self.consensus_prior = None
