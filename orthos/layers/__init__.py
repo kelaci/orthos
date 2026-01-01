@@ -9,11 +9,13 @@ from .reactive import ReactiveLayer
 from .hebbian import HebbianCore
 from .temporal import TemporalLayer
 from .attention import SparseAttentionLayer, MaskedLinear
+from .cayley import OrthosCayleyLayer
 
 __all__ = [
-    'ReactiveLayer', 
-    'HebbianCore', 
-    'TemporalLayer', 
-    'SparseAttentionLayer', 
-    'MaskedLinear'
+    'ReactiveLayer',
+    'HebbianCore',
+    'TemporalLayer',
+    'SparseAttentionLayer',
+    'MaskedLinear',
+    'OrthosCayleyLayer'
 ]
