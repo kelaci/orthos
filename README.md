@@ -1,11 +1,11 @@
 <p align="center">
-  <h1 align="center">🔧 ORTHOS</h1>
+  <h1 align="center">🔧 ORTHOS v5.0</h1>
   <p align="center">
-    <strong>Orthogonal Recursive Hierarchical Optimization System</strong>
+    <strong>The Architecture Candidate</strong>
   </p>
   <p align="center">
-    A research-grade framework for orthogonal hierarchical processing with<br/>
-    <em>Kalman filtering</em>, <em>Consensus aggregation</em>, and <em>Active Inference</em>
+    A biologically-inspired neural architecture integrating <em>Sparse Attention</em>,<br/>
+    <em>Hierarchical Bayesian Filters</em>, and <em>Structural Plasticity</em>.
   </p>
 </p>
 
@@ -41,25 +41,28 @@ Whether you're a **neuroscience researcher**, **ML engineer**, or **curious stud
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     ORTHOS ARCHITECTURE                           │
+│                 ORTHOS v5.0 ARCHITECTURE                        │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   🧠 Consensus Engine (New in v4.2)                             │
-│   └─ HierarchicalConsensus (Wisdom of Crowds Aggregation)      │
+│   🎛️ Consensus Engine (Uncertainty-Weighted)                    │
+│   └─ Bayesian Fusion & Auto-Projection                          │
 │                                                                 │
-│   🎯 Meta-Learning Layer                                        │
-│   └─ PlasticityController (ES-based optimization)              │
+│   ⚡ Sparse Attention (SAS Framework)                           │
+│   └─ Structural Plasticity & k-WTA                              │
 │                                                                 │
-│   📊 Hierarchical Processing (Probabilistic)                    │
-│   ├─ Level 3: High-level + Kalman Filter (8x resolution)       │
-│   ├─ Level 2: Mid-level + Particle Filter (4x resolution)      │
-│   ├─ Level 1: Sensory features + EKF (2x resolution)           │
-│   └─ Level 0: Raw input (1x resolution)                        │
+│   🎯 Meta-Learning Layer (v5.1 Hybrid)                          │
+│   └─ Hybrid NES + Online Contextual Bandit                      │
 │                                                                 │
-│   🧬 Core Layers                                                │
-│   ├─ ReactiveLayer: Fast feedforward processing                │
-│   ├─ HebbianCore: Adaptive Hebbian learning                    │
-│   └─ TemporalLayer: Recurrent temporal context                 │
+│   📊 Probabilistic Spine (Hierarchical Filters)                 │
+│   ├─ Level 3: SR-KF / Block-Diagonal (8x res)                   │
+│   ├─ Level 2: Particle Filter (4x res)                          │
+│   ├─ Level 1: EKF / Diagonal-KF (2x res)                        │
+│   └─ Level 0: Raw Temporal input (1x res)                       │
+│                                                                 │
+│   🧬 Core Foundations                                           │
+│   ├─ HebbianCore: Adaptive Plasticity Rules                     │
+│   ├─ ReactiveLayer: Fast Feedforward Transition                 │
+│   └─ TemporalLayer: Recurrent Context Traces                    │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -123,50 +126,33 @@ print(f"   Level 1: {len(representations[1])} representations")
 
 ---
 
-## ✨ Features
+### ⚡ Sparse Attention (SAS Framework)
 
-### 🧬 Biologically-Inspired Plasticity
+- **Structural Plasticity** - Enforces 10-30% selective connectivity
+- **k-WTA (k-Winners-Take-All)** - Active economy of neural triggers
+- **Dynamic Rewiring** - Synaptic turnover for optimal topology
 
-| Rule | Formula | Use Case |
-|------|---------|----------|
-| **Hebbian** | Δw = η · pre · post | Correlation learning |
-| **Oja's** | Δw = η · post · (pre - post·w) | PCA-like normalization |
-| **BCM** | Δw = η · post · (post - θ) · pre | Sliding threshold |
-| **STDP** | Timing-dependent | Temporal precision |
+### 📊 Probabilistic Spine (v5.0 Optimized)
 
-### 📊 Hierarchical Processing
+- **Square Root Kalman Filters** - Doubles numerical precision for stability
+- **Block-Diagonal Updates** - O(N·B²) efficiency for high-dim scaling
+- **Joseph Form Updates** - Guaranteed positive semi-definite covariance
+- **Uncertainty-Weighted Consensus** - Optimized Bayesian aggregation
 
-- **Multi-scale temporal abstraction** - Process information at different time scales
-- **Bidirectional communication** - Top-down and bottom-up information flow
-- **Configurable levels** - Add/remove levels dynamically
+### 🎯 Meta-Learning & Plasticity
 
-### 🎯 Meta-Learning
-
-- **Evolutionary Strategy (ES)** optimization of plasticity parameters
-- **Task adaptation** - Learn optimal learning rates per task
-- **Performance tracking** - Comprehensive metrics and diagnostics
-
-### 🎲 Probabilistic Spine (New in v4.2)
-
-- **Kalman Filters** - Optimal estimation for linear/Gaussian states
-- **Particle Filters** - Sequential Monte Carlo for non-linear distributions
-- **Consensus Engine** - "Wisdom of Crowds" aggregation across hierarchy levels
-- **Uncertainty Quantification** - Bayesian tracking of system confidence
-
-### 🔢 Advanced Features (PyTorch v3.1)
-
-- **BitNet Quantization** - 1.58-bit weights for efficient deployment
-- **Active Inference** - Free Energy Principle for action selection
-- **Ensemble Uncertainty** - Epistemic uncertainty estimation
-- **Dual-Timescale Traces** - Fast/slow memory consolidation
+- **Hybrid Meta-Learning (HML)** - Combined **NES** (Global) and **Contextual Bandit** (Online) optimization
+- **Dual-Timescale Memory** - Fast (hippocampal) + slow (neocortical) traces
+- **Homeostatic Regulation** - Stable weight normalization and decay
+- **Active Inference** - Decision-making via Free Energy Principle (FEP)
 
 ### 🛡️ Robustness & Safety (New in v4.2)
 
 ORTHOS isn't just theory—it's built to survive. We benchmark against critical failure modes:
 
-- **Drone Saviour Protocol** 🚁: Prevents crashes during **GPS denial** or **motor failure** by instantly switching to optical flow/IMU fusion via the Probabilistic Spine.
-- **Chaos Resilience**: Maintains stability even when signal-to-noise ratio drops to critical levels.
-- **Lifelong Learning**: Adapts to new environments without catastrophic forgetting of previous tasks.
+- **Drone Saviour Protocol** 🚁: Prevents crashes during **GPS denial** by switching to optical flow/IMU fusion via the Probabilistic Spine.
+- **Chaos Resilience**: Maintains O(1) stability even when SNR drops below 5dB.
+- **SAS Economy**: Reduces energy/memory footprint by 70% via structural sparsity.
 
 👉 [Read the Research Utility Test Plan](docs/research/TEST_PLAN_UTILITY.md)
 
@@ -224,12 +210,12 @@ The documentation has been consolidated for efficiency:
 
 | Document | Description |
 |----------|-------------|
-| [🏗️ ARCHITECTURE.md](ARCHITECTURE.md) | System design, core components, and hierarchical processing |
-| [🔬 SCIENCE.md](SCIENCE.md) | Theoretical foundations, Active Inference, and research directions |
-| [📘 GUIDES.md](GUIDES.md) | Quickstart, GPU usage, validation, and PyTorch integration |
-| [🗺️ ROADMAP.md](ROADMAP.md) | Development roadmap and version milestones |
-| [📐 ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md](ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md) | **Comprehensive mathematical foundations with practical examples and ORTHOS advantages** |
-| [🤖 .agent/docs/README.md](.agent/docs/README.md) | **Onboarding & SOPs for AI Agents** |
+| [🏗️ ARCHITECTURE.md](ARCHITECTURE.md) | System design, core components, and SAS architecture |
+| [🔬 SCIENCE.md](SCIENCE.md) | Theoretical foundations (FEP, Active Inference, Plasticity) |
+| [📘 GUIDES.md](GUIDES.md) | Quickstart, GPU usage, and validation |
+| [🗺️ ROADMAP.md](ROADMAP.md) | Version milestones and future development |
+| [📐 MATHEMATICAL_METHODS_DEEP_DIVE.md](ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md) | **Deep dive into filters, consensus, and SAS math** |
+| [🤖 .agent/docs/README.md](.agent/docs/README.md) | **Onboarding for Agentic AI Coding** |
 
 
 ---
@@ -283,10 +269,9 @@ EFE = pragmatic_value - exploration_weight * epistemic_uncertainty
 
 Meta-learning is "learning to learn" — optimizing the learning process itself.
 
-ORTHOS uses **Evolutionary Strategies (ES)** to optimize plasticity parameters:
-1. Generate population of parameter variations
-2. Evaluate each variation on tasks
-3. Update parameters toward best performers
+ORTHOS uses a **Hybrid Meta-Learning** strategy to optimize plasticity parameters:
+1. **Natural Evolution Strategies (NES)**: Global scale optimization using natural gradients and rank-normalization.
+2. **Contextual Bandit Meta-Control**: Real-time modulation of learning rates and noise scales based on prediction error and uncertainty.
 
 This allows ORTHOS to discover optimal learning rates, decay rates, and other hyperparameters automatically.
 
@@ -378,7 +363,7 @@ python test_orthos.py
 # ✅ HebbianCore test passed
 # ✅ TemporalLayer test passed
 # ...
-# 🧪 Testing Probabilistic Spine (v4.2)...
+# 🧪 Testing Probabilistic Spine (v5.0)...
 # ✅ KalmanFilter test passed
 # ✅ ConsensusEngine test passed
 # ...
@@ -395,7 +380,7 @@ python test_orthos.py
 | Meta-Learning | MetaOptimizer training |
 | Configuration | Default configs |
 | Integration | Full pipeline |
-| Probabilistic Spine (v4.2) | Kalman, Particle, Consensus |
+| Probabilistic Spine (v5.0) | Kalman, Particle, Consensus |
 | Research Utility | Drone Saviour, Noise Resilience |
 
 ---
@@ -491,34 +476,28 @@ ORTHOS is built on foundational work from neuroscience and machine learning:
 
 ## 🗺️ Roadmap
 
-### Current: v5.0.0 (Rebrand) ✅
+### Current: v5.1.0 (Hybrid Intelligence) ✅
 
-- [x] **Major Rebrand from GAIA to ORTHOS**
-- [x] **Probabilistic Spine Integration**
-  - [x] Standard & Extended Kalman Filters
-  - [x] Particle Filters (SMC)
-  - [x] Outlier-robust Consensus Engine
-- [x] Core architecture with abstract base classes
-- [x] Multiple Hebbian learning rules
-- [x] Hierarchical processing system
-- [x] Evolutionary Strategy optimization
-- [x] Meta-learning framework
-- [x] Comprehensive documentation
+- [x] **Hybrid Meta-Learning (HML)**
+  - [x] Natural Evolution Strategies (NES)
+  - [x] Contextual Bandit Meta-Controller
+  - [x] HybridMetaManager Orchestration
+- [x] **Advanced Hierarchical Probabilistic Spine**
+  - [x] Square Root & Block-Diagonal Kalman Filters
+  - [x] Outlier-robust, Uncertainty-weighted Consensus
+  - [x] Joseph Form stability & Auto-Projection
+- [x] **Sparse Attention (SAS Framework)**
+- [x] **Full Rebrand & Consolidation**
 
-### Coming: v5.1.0 🚧
+### Coming: v5.2.0 (Active Adaptation) 🚧
 
-- [ ] Advanced ES variants (CMA-ES, NES)
-- [ ] Attention mechanisms for hierarchy
-- [ ] Multi-objective optimization
-- [ ] GPU acceleration improvements
+- [ ] Multi-objective reward structures for Active Inference
+- [ ] Enhanced GPU acceleration kernels for masked operations
 
-
-### Future: v4.4.0+
-
-- [ ] Neuroevolution of architectures
-- [ ] Reinforcement learning integration
-- [ ] Multi-modal processing
-- [ ] Production deployment tools
+### Future: v6.0.0+
+- [ ] Neuroevolution of hierarchical topologies
+- [ ] Cross-modal sensory feedback integration (e.g., Audio-Visual)
+- [ ] Real-time embedded deployment (Quantized BitNet)
 
 See [Development Roadmap](ROADMAP.md) for details.
 
@@ -548,11 +527,11 @@ ORTHOS is a **research project** focused on exploring novel learning architectur
 <details>
 <summary><strong>Can I use ORTHOS with PyTorch/TensorFlow?</strong></summary>
 
-Yes! ORTHOS has two implementations:
-- **NumPy v4.x**: Pure NumPy for research/prototyping
-- **PyTorch v3.1**: GPU-accelerated for training
+Yes! ORTHOS v5.0 is designed for hybrid performance:
+- **NumPy Backend**: Default pure Python research mode.
+- **CuPy/PyTorch Backend**: High-performance GPU acceleration for high-dim SAS architectures.
 
-See [PyTorch Integration Guide](docs/guides/pytorch-integration.md).
+See [GPU Integration Guide](docs/guides/gpu-integration.md).
 
 </details>
 
@@ -576,7 +555,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ```
 MIT License
 
-Copyright (c) 2025 ORTHOS Development Team
+Copyright (c) 2026 ORTHOS Development Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
