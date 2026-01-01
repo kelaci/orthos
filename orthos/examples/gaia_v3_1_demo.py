@@ -43,7 +43,7 @@ torch.set_float32_matmul_precision("high")
 # ============================================================================
 
 @dataclass
-class GaiaConfigEnhanced:
+class OrthosConfigEnhanced:
     # Core dimensions
     state_dim: int = 1
     action_dim: int = 1
@@ -71,7 +71,7 @@ class GaiaConfigEnhanced:
     track_metrics: bool = True
     trace_history_len: int = 1000
 
-cfg = GaiaConfigEnhanced()
+cfg = OrthosConfigEnhanced()
 
 # ============================================================================
 # ENHANCED PLASTIC LINEAR WITH DIAGNOSTICS
@@ -80,7 +80,7 @@ cfg = GaiaConfigEnhanced()
 class DiagnosticPlasticLinear(nn.Module):
     """Enhanced version with detailed tracking for research analysis"""
     
-    def __init__(self, in_features: int, out_features: int, cfg: GaiaConfigEnhanced):
+    def __init__(self, in_features: int, out_features: int, cfg: OrthosConfigEnhanced):
         super().__init__()
         self.cfg = cfg
         self.in_features = in_features
@@ -183,7 +183,7 @@ class DiagnosticPlasticLinear(nn.Module):
 # ============================================================================
 
 class EnhancedDeepPlasticMember(nn.Module):
-    def __init__(self, cfg: GaiaConfigEnhanced):
+    def __init__(self, cfg: OrthosConfigEnhanced):
         super().__init__()
         inp = cfg.state_dim + cfg.action_dim
         h = cfg.hidden_dim
@@ -211,7 +211,7 @@ class EnhancedDeepPlasticMember(nn.Module):
         return diag
 
 class EnhancedEnsembleWorldModel(nn.Module):
-    def __init__(self, cfg: GaiaConfigEnhanced):
+    def __init__(self, cfg: OrthosConfigEnhanced):
         super().__init__()
         self.models = nn.ModuleList(
             [EnhancedDeepPlasticMember(cfg) for _ in range(cfg.n_ensemble)]
@@ -230,7 +230,7 @@ class EnhancedEnsembleWorldModel(nn.Module):
 # ============================================================================
 
 class StochasticActionModel(nn.Module):
-    def __init__(self, cfg: GaiaConfigEnhanced):
+    def __init__(self, cfg: OrthosConfigEnhanced):
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(cfg.state_dim, 64),
@@ -252,8 +252,8 @@ class StochasticActionModel(nn.Module):
 # ENHANCED ORTHOS AGENT WITH COMPREHENSIVE DIAGNOSTICS
 # ============================================================================
 
-class GaiaAgentEnhanced:
-    def __init__(self, cfg: GaiaConfigEnhanced):
+class OrthosAgentEnhanced:
+    def __init__(self, cfg: OrthosConfigEnhanced):
         self.cfg = cfg
         self.wm = EnhancedEnsembleWorldModel(cfg).to(device)
         self.am = StochasticActionModel(cfg).to(device)
@@ -350,7 +350,7 @@ def run_comprehensive_validation():
     print("🔬 ORTHOS PROTOCOL v3.1 — COMPREHENSIVE VALIDATION")
     print("="*80 + "\n")
     
-    agent = GaiaAgentEnhanced(cfg)
+    agent = OrthosAgentEnhanced(cfg)
     state = torch.tensor([[0.0]], device=device)
     
     print("📊 Running 200-step simulation with diagnostics...\n")

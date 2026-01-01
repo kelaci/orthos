@@ -18,7 +18,7 @@ def plasticity_demo():
     print("=" * 50)
 
     # Setup logging
-    logger = setup_logging('gaia_plasticity', 'INFO')
+    logger = setup_logging('orthos_plasticity', 'INFO')
     logger.info("Starting ORTHOS plasticity demo")
 
     # Create target modules for plasticity control

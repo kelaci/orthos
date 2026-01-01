@@ -5,14 +5,14 @@ We are excited to announce **ORTHOS v5.0.0**, a major identity transformation th
 ## 🌟 Key Highlights
 
 ### 1. 🏷️ Full Rebranding
-- **Name Change**: Transitioned from GAIA to **ORTHOS** across the entire codebase, documentation, and metadata.
+- **Name Change**: Transitioned from ORTHOS to **ORTHOS** across the entire codebase, documentation, and metadata.
 - **Identity**: Refocused the project's vision on **orthogonality**, **recursive optimization**, and **probabilistic filtering**.
-- **Package Relocation**: Main package directory renamed from `gaia/` to `orthos/`.
+- **Package Relocation**: Main package directory renamed from `orthos/` to `orthos/`.
 
 ### 2. 📦 Infrastructure Updates
 - **PyPI Readiness**: Updated `pyproject.toml` and `setup.py` with new package names (`orthos-framework`, `orthos-neuro`).
 - **Version Bump**: Bumped from 4.2.0 to **5.0.0** to reflect the major non-functional changes and breaking import changes.
-- **Migration Path**: Introduced `MIGRATION_GAIA_TO_ORTHOS.md` to assist current users.
+- **Migration Path**: Introduced `MIGRATION_ORTHOS_TO_ORTHOS.md` to assist current users.
 
 ### 3. 🧪 Validation
 - **Unified Test Suite**: `test_orthos.py` has been evolved into `test_orthos.py`.
@@ -24,12 +24,12 @@ We are excited to announce **ORTHOS v5.0.0**, a major identity transformation th
 
 ## ⚠️ Breaking Changes
 
-- **Import Namespaces**: All code previously importing from `gaia` must now import from `orthos`.
+- **Import Namespaces**: All code previously importing from `orthos` must now import from `orthos`.
 - **File Names**: Several core scripts have been renamed (e.g., `run_orthos_v42.py` → `run_orthos_v42.py`).
 
 ## 🛠️ Full Changelog
 
-- **Renamed**: `gaia/` directory to `orthos/`.
+- **Renamed**: `orthos/` directory to `orthos/`.
 - **Renamed**: `test_orthos.py` to `test_orthos.py`.
 - **Renamed**: `run_orthos_v42.py` to `run_orthos_v42.py`.
 - **Renamed**: `ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md` to `ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md`.
@@ -130,7 +130,7 @@ We are thrilled to announce the open-source release of **ORTHOS v4.1.0** (Orthog
 - **Fixed**: `ReactiveLayer.activation()` method implementation.
 - **Fixed**: `TemporalLayer` activation attribute/method namespace collision.
 - **Fixed**: Indentation issues in `validate_config`.
-- **Moved**: `gaia_v3_1.py` prototype to `examples/` to maintain clean root.
+- **Moved**: `orthos_v3_1.py` prototype to `examples/` to maintain clean root.
 
 ## 🔜 Next Steps: v4.2
 See [Sparse Attention Specification](docs/architecture/features/sparse_attention.md) for the detailed v4.2 architecture plan.

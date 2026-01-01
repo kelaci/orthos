@@ -987,7 +987,7 @@ Just like the brain forms new connections and prunes old ones, SAS performs **Sy
 
 ```python
 # Low learning rates, high stability
-cfg = GaiaConfig(
+cfg = OrthosConfig(
     fast_trace_lr=0.01,      # low
     slow_trace_lr=0.001,     # very low
     homeostatic_target=2.0,  # strict
@@ -1483,13 +1483,13 @@ results = {
         'adaptation_time': 'N/A',
         'inference_time': '22ms'
     },
-    'GAIA_v4_1': {
+    'ORTHOS_v4_1': {
         'error_rate': 0.08,      # 8% error
         'crashes': 0,            # 0 crashes ✅
         'adaptation_time': '50ms',
         'inference_time': '12ms'
     },
-    'GAIA_v4_2': {
+    'ORTHOS_v4_2': {
         'error_rate': 0.06,      # 6% error ✅ (25% improvement)
         'crashes': 0,            # 0 crashes ✅
         'adaptation_time': '35ms', # 30% faster ✅
@@ -1503,8 +1503,8 @@ results = {
 ```python
 # Signal-to-Noise Ratio (SNR) degradation
 noise_levels = [30, 20, 10, 5, 0]  # dB
-gaia_v4_2_errors = [0.015, 0.025, 0.04, 0.06, 0.10]  # v4.2 ✨
-gaia_v4_1_errors = [0.02, 0.03, 0.05, 0.08, 0.12]
+orthos_v4_2_errors = [0.015, 0.025, 0.04, 0.06, 0.10]  # v4.2 ✨
+orthos_v4_1_errors = [0.02, 0.03, 0.05, 0.08, 0.12]
 lstm_errors = [0.03, 0.15, 0.45, 0.78, 0.95]
 
 # Plot would show:
@@ -1528,12 +1528,12 @@ metrics = {
         'RMSE': 15.7,
         'directional_accuracy': 0.61
     },
-    'GAIA_v4_1': {
+    'ORTHOS_v4_1': {
         'MAE': 8.1,       # ✅ 35% improvement
         'RMSE': 11.4,     # ✅ 27% improvement
         'directional_accuracy': 0.68  # ✅ 10% improvement
     },
-    'GAIA_v4_2': {
+    'ORTHOS_v4_2': {
         'MAE': 7.2,       # ✨ 11% improvement over v4.1
         'RMSE': 10.1,     # ✨ 11% improvement over v4.1
         'directional_accuracy': 0.72  # ✨ 6% improvement over v4.1
@@ -1599,7 +1599,7 @@ metrics = {
 models = {
     'LSTM': LSTMModel(input_size=64, hidden_size=128),
     'Transformer': TransformerModel(d_model=128, n_heads=8),
-    'GAIA_v4_2': GAIAHierarchy(levels=4)
+    'ORTHOS_v4_2': ORTHOSHierarchy(levels=4)
 }
 
 # Run comparative benchmarks
@@ -1637,8 +1637,8 @@ import matplotlib.pyplot as plt
 # Plot error curves
 plt.figure(figsize=(12, 8))
 for noise_level in noise_levels:
-    plt.plot(noise_levels, gaia_v4_2_errors, 'o-', label='ORTHOS v4.2', linewidth=3)
-    plt.plot(noise_levels, gaia_v4_1_errors, 's--', label='ORTHOS v4.1', linewidth=2)
+    plt.plot(noise_levels, orthos_v4_2_errors, 'o-', label='ORTHOS v4.2', linewidth=3)
+    plt.plot(noise_levels, orthos_v4_1_errors, 's--', label='ORTHOS v4.1', linewidth=2)
     plt.plot(noise_levels, lstm_errors, '^:', label='LSTM', linewidth=2)
 
 plt.xlabel('Noise Level (dB)', fontsize=14)

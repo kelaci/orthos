@@ -131,7 +131,7 @@
 ## 📋 Version History
 
 ### v5.0 (2026-01-01)
-- **Major Rebrand**: GAIA → ORTHOS
+- **Major Rebrand**: ORTHOS → ORTHOS
 - Integration of Probabilistic Spine (Kalman, EKF, Particle Filters)
 - Consensus Engine & Hierarchical Coordination
 - Joseph Form & Diagonal Covariance Optimizations

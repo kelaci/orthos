@@ -1,21 +1,21 @@
-# Migration Guide: GAIA v4.2 → ORTHOS v5.0
+# Migration Guide: ORTHOS v4.2 → ORTHOS v5.0
 
 ## ⚡ Overview
 
-ORTHOS v5.0 is a major rebranding release from GAIA. This guide helps you migrate your existing codebase to use the new ORTHOS framework.
+ORTHOS v5.0 is a major rebranding release from ORTHOS. This guide helps you migrate your existing codebase to use the new ORTHOS framework.
 
 ## ⚠️ Breaking Changes
 
 ### 📦 Package Identity
-The package has been renamed from `gaia-neuro` to `orthos-neuro`.
+The package has been renamed from `orthos-neuro` to `orthos-neuro`.
 
 ### 🧩 Import Path Changes
-All top-level imports have changed from `gaia` to `orthos`.
+All top-level imports have changed from `orthos` to `orthos`.
 
 ```python
-# ❌ Old (GAIA)
-from gaia.layers.hebbian import HebbianCore
-from gaia.hierarchy.manager import HierarchyManager
+# ❌ Old (ORTHOS)
+from orthos.layers.hebbian import HebbianCore
+from orthos.hierarchy.manager import HierarchyManager
 
 # ✅ New (ORTHOS)
 from orthos.layers.hebbian import HebbianCore
@@ -25,11 +25,11 @@ from orthos.hierarchy.manager import HierarchyManager
 ## 🛠️ How to Migrate
 
 ### 1. Update Dependencies
-If you have `gaia-neuro` in your `requirements.txt` or `pyproject.toml`, update it:
+If you have `orthos-neuro` in your `requirements.txt` or `pyproject.toml`, update it:
 
 ```bash
 # Uninstall old package
-pip uninstall gaia-neuro
+pip uninstall orthos-neuro
 
 # Install new package
 pip install orthos-neuro
@@ -40,8 +40,8 @@ Use `sed` or your IDE's search and replace to update your code:
 
 **Using sed (Linux/macOS):**
 ```bash
-find . -name "*.py" -exec sed -i 's/\bgaia\b/orthos/g' {} +
-find . -name "*.py" -exec sed -i 's/\bGAIA\b/ORTHOS/g' {} +
+find . -name "*.py" -exec sed -i 's/\borthos\b/orthos/g' {} +
+find . -name "*.py" -exec sed -i 's/\bORTHOS\b/ORTHOS/g' {} +
 ```
 
 ### 3. Update File References
