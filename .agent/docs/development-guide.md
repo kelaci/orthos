@@ -1,6 +1,6 @@
 # 🛠️ Development Guide for Agents
 
-This guide defines the standards and protocols for AI agents contributing to the GAIA codebase.
+This guide defines the standards and protocols for AI agents contributing to the ORTHOS codebase.
 
 ## 📜 Coding Standards
 
@@ -33,28 +33,28 @@ def normalize_weights(weights: np.ndarray, axis: int = 0) -> np.ndarray:
 ```
 
 ### 3. Modularity First
-If a logic block is used in two places, move it to `gaia/utils/` or `gaia/core/`.
+If a logic block is used in two places, move it to `orthos/utils/` or `orthos/core/`.
 
 ## 🧪 Testing Protocol (Strict)
 
 Before any non-trivial change, follow this "Agent Test Loop":
 
-1.  **Baseline**: Run `python test_gaia.py` to ensure current state is green.
+1.  **Baseline**: Run `python test_orthos.py` to ensure current state is green.
 2.  **Implementation**: Make your changes.
-3.  **Local Test**: Create a temporary test script or add a case to `test_gaia.py`.
+3.  **Local Test**: Create a temporary test script or add a case to `test_orthos.py`.
 4.  **Verification**: Run the full suite again.
 5.  **Benchmark**: If you changed a core loop, run `python benchmark.py` to ensure no performance regression.
 
 ## 🚀 Common Workflow Templates
 
 ### Adding a New Layer
-1.  Inherit from `BaseLayer` in `gaia/core/base.py`.
+1.  Inherit from `BaseLayer` in `orthos/core/base.py`.
 2.  Implement `forward`, `update`, and `reset`.
-3.  Add the layer to `gaia/layers/__init__.py`.
-4.  Add a test case in `test_gaia.py` under the `Layers` section.
+3.  Add the layer to `orthos/layers/__init__.py`.
+4.  Add a test case in `test_orthos.py` under the `Layers` section.
 
 ### Modifying Plasticity Rules
-1.  Locate the rule in `gaia/plasticity/rules.py`.
+1.  Locate the rule in `orthos/plasticity/rules.py`.
 2.  Update the mathematical implementation.
 3.  Check if `PlasticityController` needs to pass new parameters.
 4.  Update documentation in `docs/architecture/plasticity-system.md`.
@@ -69,7 +69,7 @@ As an agent, when you finish a task:
 ---
 
 ## 🚫 What NOT to do
-- **Do NOT** use `print()` for debugging in production code. Use `gaia.utils.logging`.
-- **Do NOT** hardcode hyperparameters. Use `gaia.config.defaults`.
+- **Do NOT** use `print()` for debugging in production code. Use `orthos.utils.logging`.
+- **Do NOT** hardcode hyperparameters. Use `orthos.config.defaults`.
 - **Do NOT** ignore Lint errors.
-- **Do NOT** modify `gaia/core/` without explicit permission or thorough architectural review.
+- **Do NOT** modify `orthos/core/` without explicit permission or thorough architectural review.

@@ -1,5 +1,5 @@
 """
-Test script for GAIA v4.2 Probabilistic Spine.
+Test script for ORTHOS v4.2 Probabilistic Spine.
 
 Verifies the refactored Kalman Filters, Particle Filters, and 
 Consensus Engine implementation.
@@ -13,12 +13,12 @@ from typing import List
 # Add current directory to path
 sys.path.append(os.getcwd())
 
-from gaia.filters.kalman import KalmanFilter, ExtendedKalmanFilter
-from gaia.filters.particle import ParticleFilter
-from gaia.consensus.engine import HierarchicalConsensus, LevelPrediction
-from gaia.hierarchy.filtered_level import FilteredHierarchicalLevel
-from gaia.hierarchy.consensus_manager import ConsensusHierarchyManager
-from gaia.layers.reactive import ReactiveLayer
+from orthos.filters.kalman import KalmanFilter, ExtendedKalmanFilter
+from orthos.filters.particle import ParticleFilter
+from orthos.consensus.engine import HierarchicalConsensus, LevelPrediction
+from orthos.hierarchy.filtered_level import FilteredHierarchicalLevel
+from orthos.hierarchy.consensus_manager import ConsensusHierarchyManager
+from orthos.layers.reactive import ReactiveLayer
 
 def test_kalman_filter():
     print("🧪 Testing Kalman Filter...")
@@ -103,7 +103,7 @@ def test_filtered_hierarchy():
     print("✅ Filtered Hierarchy passed")
 
 if __name__ == "__main__":
-    print("🚀 Running GAIA v4.2 Probabilistic Spine Tests")
+    print("🚀 Running ORTHOS v4.2 Probabilistic Spine Tests")
     print("=" * 50)
     try:
         test_kalman_filter()

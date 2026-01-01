@@ -3,15 +3,15 @@ Integration and full pipeline tests.
 """
 import pytest
 import numpy as np
-from gaia.hierarchy.manager import HierarchyManager
-from gaia.hierarchy.level import HierarchicalLevel
-from gaia.layers.reactive import ReactiveLayer
-from gaia.layers.hebbian import HebbianCore
-from gaia.plasticity.controller import PlasticityController
-from gaia.meta_learning.optimizer import MetaOptimizer
+from orthos.hierarchy.manager import HierarchyManager
+from orthos.hierarchy.level import HierarchicalLevel
+from orthos.layers.reactive import ReactiveLayer
+from orthos.layers.hebbian import HebbianCore
+from orthos.plasticity.controller import PlasticityController
+from orthos.meta_learning.optimizer import MetaOptimizer
 
 def test_full_pipeline():
-    """Test full integration of GAIA components."""
+    """Test full integration of ORTHOS components."""
     manager = HierarchyManager()
 
     # Build hierarchy

@@ -1,5 +1,5 @@
 """
-Comprehensive validation tests for GAIA consolidation improvements.
+Comprehensive validation tests for ORTHOS consolidation improvements.
 
 Tests for:
 - Kalman filter diagonal covariance optimization
@@ -14,10 +14,10 @@ import numpy as np
 import pytest
 from typing import List, Optional
 
-from gaia.filters.kalman import KalmanFilter, ExtendedKalmanFilter
-from gaia.hierarchy.filtered_level import FilteredHierarchicalLevel
-from gaia.hierarchy.consensus_manager import ConsensusHierarchyManager
-from gaia.consensus.engine import HierarchicalConsensus, LevelPrediction, ConsensusResult
+from orthos.filters.kalman import KalmanFilter, ExtendedKalmanFilter
+from orthos.hierarchy.filtered_level import FilteredHierarchicalLevel
+from orthos.hierarchy.consensus_manager import ConsensusHierarchyManager
+from orthos.consensus.engine import HierarchicalConsensus, LevelPrediction, ConsensusResult
 
 
 class TestKalmanFilterOptimizations:

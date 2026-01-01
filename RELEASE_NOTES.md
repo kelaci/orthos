@@ -1,6 +1,50 @@
-# 🚀 GAIA v4.2.0 Release Notes
+# 🚀 ORTHOS v5.0.0 Release Notes - The Rebranding Release
 
-We are proud to announce **GAIA v4.2.0**, featuring the **Probabilistic Spine**—a major advancement in hierarchical consistency and numerical stability. See [Detailed Consolidation Improvements](docs/architecture/consolidation_improvements_v42.md) for a full technical breakdown.
+We are excited to announce **ORTHOS v5.0.0**, a major identity transformation that aligns the codebase with its mathematical foundations: **Orthogonal Recursive Hierarchical Optimization System**.
+
+## 🌟 Key Highlights
+
+### 1. 🏷️ Full Rebranding
+- **Name Change**: Transitioned from GAIA to **ORTHOS** across the entire codebase, documentation, and metadata.
+- **Identity**: Refocused the project's vision on **orthogonality**, **recursive optimization**, and **probabilistic filtering**.
+- **Package Relocation**: Main package directory renamed from `gaia/` to `orthos/`.
+
+### 2. 📦 Infrastructure Updates
+- **PyPI Readiness**: Updated `pyproject.toml` and `setup.py` with new package names (`orthos-framework`, `orthos-neuro`).
+- **Version Bump**: Bumped from 4.2.0 to **5.0.0** to reflect the major non-functional changes and breaking import changes.
+- **Migration Path**: Introduced `MIGRATION_GAIA_TO_ORTHOS.md` to assist current users.
+
+### 3. 🧪 Validation
+- **Unified Test Suite**: `test_orthos.py` has been evolved into `test_orthos.py`.
+- **Verified Stability**: Maintained 100% pass rate on all core and integration tests through the rebranding process.
+
+### 4. 📖 Documentation Overhaul
+- **Terminology**: updated all references from "Generalized Adaptive Intelligent Architecture" to "Orthogonal Recursive Hierarchical Optimization System".
+- **Mathematical Deep Dive**: Renamed and updated the deep dive document to `ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md`.
+
+## ⚠️ Breaking Changes
+
+- **Import Namespaces**: All code previously importing from `gaia` must now import from `orthos`.
+- **File Names**: Several core scripts have been renamed (e.g., `run_orthos_v42.py` → `run_orthos_v42.py`).
+
+## 🛠️ Full Changelog
+
+- **Renamed**: `gaia/` directory to `orthos/`.
+- **Renamed**: `test_orthos.py` to `test_orthos.py`.
+- **Renamed**: `run_orthos_v42.py` to `run_orthos_v42.py`.
+- **Renamed**: `ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md` to `ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md`.
+- **Updated**: `pyproject.toml`, `setup.py`, and `requirements.txt`.
+- **Updated**: All docstrings, comments, and strings in Python files.
+- **Updated**: All Markdown headers and project descriptions.
+
+## 🔜 Next Steps: v5.1
+Focus shifts to **Structural Plasticity** (Sparse Attention) and advanced attention mechanisms within the ORTHOS hierarchy.
+
+---
+
+# 🚀 ORTHOS v4.2.0 Release Notes
+
+We are proud to announce **ORTHOS v4.2.0**, featuring the **Probabilistic Spine**—a major advancement in hierarchical consistency and numerical stability. See [Detailed Consolidation Improvements](docs/architecture/consolidation_improvements_v42.md) for a full technical breakdown.
 
 ## 🌟 Key Highlights
 
@@ -19,12 +63,12 @@ We are proud to announce **GAIA v4.2.0**, featuring the **Probabilistic Spine**�
 - **Emergency Handover**: Real-time switch from GPS to optical flow/IMU fusion via the Probabilistic Spine.
 
 ### 4. 📐 Mathematical Deep Dive
-- Released the [Comprehensive Mathematical Methods Deep Dive](GAIA_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md), detailing the Bayesian foundations of GAIA.
+- Released the [Comprehensive Mathematical Methods Deep Dive](ORTHOS_MATHEMATICAL_METHODS_DEEP_DIVE_EN.md), detailing the Bayesian foundations of ORTHOS.
 
 ## 🛠️ Full Changelog
 
-- **Added**: `gaia/filters/` directory with `KalmanFilter`, `ExtendedKalmanFilter`, and `ParticleFilter`.
-- **Added**: `gaia/consensus/` directory with `ConsensusEngine` for multi-level aggregation.
+- **Added**: `orthos/filters/` directory with `KalmanFilter`, `ExtendedKalmanFilter`, and `ParticleFilter`.
+- **Added**: `orthos/consensus/` directory with `ConsensusEngine` for multi-level aggregation.
 - **Added**: `ConsensusHierarchyManager` with `auto_projection` and `top_down_feedback`.
 - **Improved**: `KalmanFilter` now supports `use_diagonal_covariance`, `use_joseph_form`, and `min_obs_noise`.
 - **Improved**: `ARCHITECTURE.md` and `README.md` updated to reflect the Probabilistic Spine.
@@ -36,9 +80,9 @@ Focus shifts to **Structural Plasticity** (Sparse Attention) and **CMA-ES** for 
 
 ---
 
-# 🚀 GAIA v4.1.0 Release Notes
+# 🚀 ORTHOS v4.1.0 Release Notes
 
-We are thrilled to announce the open-source release of **GAIA v4.1.0** (Generalized Adaptive Intelligent Architecture). This release marks a significant milestone in providing a robust, research-grade framework for biologically-inspired AI.
+We are thrilled to announce the open-source release of **ORTHOS v4.1.0** (Orthogonal Recursive Hierarchical Optimization System). This release marks a significant milestone in providing a robust, research-grade framework for biologically-inspired AI.
 
 ## 🌟 Key Highlights
 

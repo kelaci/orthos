@@ -1,8 +1,8 @@
-y 📖 GAIA Python Coding Standard
+y 📖 ORTHOS Python Coding Standard
 
 ## Research-Grade Python Coding Standard for Open Source Projects
 
-This document establishes the coding standards for the GAIA project, following best practices for research-grade Python development and open source collaboration.
+This document establishes the coding standards for the ORTHOS project, following best practices for research-grade Python development and open source collaboration.
 
 ---
 
@@ -79,7 +79,7 @@ def calc_act(input, act_type='relu', lr=0.01):
 | Classes | `PascalCase` | `HebbianCore` |
 | Constants | `UPPER_SNAKE` | `MAX_ITERATIONS` |
 | Modules | `snake_case` | `plasticity_rules.py` |
-| Packages | `snake_case` | `gaia.layers` |
+| Packages | `snake_case` | `orthos.layers` |
 
 ### 2.3 Type Hints
 
@@ -114,12 +114,12 @@ import numpy as np
 from scipy import linalg
 
 # Local imports
-from gaia.core.tensor import apply_activation
-from gaia.layers.hebbian import HebbianCore
+from orthos.core.tensor import apply_activation
+from orthos.layers.hebbian import HebbianCore
 
 # ❌ BAD: Mixed imports
 import numpy as np
-from gaia.core.tensor import apply_activation
+from orthos.core.tensor import apply_activation
 import os
 ```
 
@@ -275,7 +275,7 @@ def apply_activation(
 """
 Tensor operations and utilities.
 
-This module provides fundamental tensor operations used throughout GAIA,
+This module provides fundamental tensor operations used throughout ORTHOS,
 including weight initialization, activation functions, and normalization.
 
 Key Features:
@@ -291,7 +291,7 @@ Dependencies:
 - cupy: GPU acceleration (optional)
 
 Usage:
-    from gaia.core.tensor import initialize_weights, apply_activation
+    from orthos.core.tensor import initialize_weights, apply_activation
     weights = initialize_weights((100, 50), 'he')
     output = apply_activation(input_data, 'relu')
 """
@@ -623,14 +623,14 @@ def review_checklist():
 ## 📦 Project Structure
 
 ```
-gaia/
+orthos/
 ├── 📄 CODING_STANDARD.md        ← This document
 ├── 📄 README.md                 ← Main documentation
 ├── 📄 LICENSE                   ← MIT License
 ├── 📄 requirements.txt          ← Dependencies
-├── 📄 test_gaia.py              ← Test suite
+├── 📄 test_orthos.py              ← Test suite
 │
-├── 📁 gaia/                     ← Main package
+├── 📁 orthos/                     ← Main package
 │   ├── core/                    ← Base classes & types
 │   │   ├── base.py              ← Abstract base classes
 │   │   ├── tensor.py            ← Tensor operations
@@ -713,16 +713,16 @@ pip install -r dev-requirements.txt
 
 ```bash
 # Format code
-black gaia/ tests/
+black orthos/ tests/
 
 # Lint code
-flake8 gaia/ tests/
+flake8 orthos/ tests/
 
 # Type checking
-mypy gaia/ tests/
+mypy orthos/ tests/
 
 # Run tests
-pytest tests/ --cov=gaia --cov-report=html
+pytest tests/ --cov=orthos --cov-report=html
 
 # Build documentation
 mkdocs build
@@ -732,7 +732,7 @@ mkdocs build
 
 ```yaml
 # Example GitHub Actions workflow
-name: GAIA CI/CD
+name: ORTHOS CI/CD
 
 on: [push, pull_request]
 
@@ -757,13 +757,13 @@ jobs:
         pip install -r dev-requirements.txt
 
     - name: Lint with flake8
-      run: flake8 gaia/ tests/
+      run: flake8 orthos/ tests/
 
     - name: Type check with mypy
-      run: mypy gaia/ tests/
+      run: mypy orthos/ tests/
 
     - name: Test with pytest
-      run: pytest tests/ --cov=gaia --cov-report=xml
+      run: pytest tests/ --cov=orthos --cov-report=xml
 
     - name: Upload coverage
       uses: codecov/codecov-action@v3
@@ -838,7 +838,7 @@ jobs:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-01-01 | Initial coding standard for GAIA v4.1 |
+| 1.0 | 2026-01-01 | Initial coding standard for ORTHOS v4.1 |
 | 1.1 | 2026-01-15 | Added research-specific best practices |
 | 1.2 | 2026-02-01 | Updated testing requirements |
 | 1.3 | 2026-01-01 | Added Section 2.6 on minimizing conditional logic |
@@ -852,10 +852,10 @@ This coding standard is inspired by best practices from:
 - NumPy/SciPy community
 - Research Software Engineering Association
 - Open Source Initiative
-- GAIA contributors and maintainers
+- ORTHOS contributors and maintainers
 
 ---
 
-> **Note**: This coding standard is a living document. As GAIA evolves, so will these guidelines. Contributions to improve this standard are welcome!
+> **Note**: This coding standard is a living document. As ORTHOS evolves, so will these guidelines. Contributions to improve this standard are welcome!
 
 🧠 **Made with care for research and open source communities**

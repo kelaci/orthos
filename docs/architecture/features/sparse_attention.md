@@ -2,14 +2,14 @@
 
 **Target Version**: v4.2  
 **Status**: Planning (Enterprise-Ready Specification)  
-**Module**: `gaia.layers.attention`  
+**Module**: `orthos.layers.attention`  
 **Last Updated**: 2024-12-31
 
 ---
 
 ## 1. Executive Summary
 
-The SAS system transitions GAIA from a **Passive/Dense** processing model to an **Active/Sparse** model, targeting:
+The SAS system transitions ORTHOS from a **Passive/Dense** processing model to an **Active/Sparse** model, targeting:
 - **Computational Efficiency**: $O(N^2) \rightarrow O(N \log N)$ complexity reduction
 - **Adaptive Topology**: Self-organizing network structure via Hebbian structural plasticity
 - **Business Value**: 60-80% reduction in compute costs, edge deployment capability
@@ -38,14 +38,14 @@ The human brain maintains ~100 trillion synapses but only ~10% are active at any
 ### 3.1 The Sparse Tensor Core
 
 #### Class: `MaskedLinear`
-Wraps a standard weight matrix but enforces a binary topology mask. Inherits from `gaia.core.base.Layer` and supports GPU acceleration.
+Wraps a standard weight matrix but enforces a binary topology mask. Inherits from `orthos.core.base.Layer` and supports GPU acceleration.
 
 ```python
 from typing import Optional, Tuple
 import numpy as np
-from gaia.core.base import Layer
-from gaia.core.tensor import initialize_weights
-from gaia.core.gpu_utils import get_array_module, dot, matmul, zeros
+from orthos.core.base import Layer
+from orthos.core.tensor import initialize_weights
+from orthos.core.gpu_utils import get_array_module, dot, matmul, zeros
 
 class MaskedLinear(Layer):
     """
@@ -170,8 +170,8 @@ Where:
 #### Class: `SparseAttentionLayer`
 
 ```python
-from gaia.core.base import PlasticComponent
-from gaia.core.gpu_utils import get_array_module, sqrt, matmul, softmax
+from orthos.core.base import PlasticComponent
+from orthos.core.gpu_utils import get_array_module, sqrt, matmul, softmax
 
 class SparseAttentionLayer(Layer, PlasticComponent):
     """
@@ -463,7 +463,7 @@ class SparsityScheduler:
 ### 4.2 Sparsity Monitor (Observability)
 
 ```python
-from gaia.core.gpu_utils import get_array_module, to_cpu
+from orthos.core.gpu_utils import get_array_module, to_cpu
 
 class SparsityMonitor:
     """
@@ -531,7 +531,7 @@ class SparsityMonitor:
 ### 4.3 Stability Guardrails
 
 ```python
-from gaia.core.gpu_utils import get_array_module, to_cpu
+from orthos.core.gpu_utils import get_array_module, to_cpu
 
 class StructuralGuardrails:
     """
@@ -609,7 +609,7 @@ class StructuralGuardrails:
 Implements **Elastic Weight Consolidation (EWC)**-like protection:
 
 ```python
-from gaia.core.gpu_utils import get_array_module
+from orthos.core.gpu_utils import get_array_module
 
 class SynapticConsolidation:
     """

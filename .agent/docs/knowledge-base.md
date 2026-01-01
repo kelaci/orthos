@@ -1,6 +1,6 @@
 # 🧠 Agent Knowledge Base & Traps
 
-This document catalogs "tribal knowledge," common bugs, and mathematical nuances discovered during the development of GAIA. Consult this before refactoring core logic.
+This document catalogs "tribal knowledge," common bugs, and mathematical nuances discovered during the development of ORTHOS. Consult this before refactoring core logic.
 
 ## 🪤 Common Traps
 
@@ -10,19 +10,19 @@ This document catalogs "tribal knowledge," common bugs, and mathematical nuances
 
 ### 2. Hebbian Explosions
 **Issue**: Pure Hebbian learning ($ \Delta w = \eta \cdot x \cdot y $) is unstable and leads to infinite weight growth.
-**Fix**: Always use a normalization rule (like Oja's) or weight decay. Check `gaia/plasticity/rules.py` for "Homeostatic" variants.
+**Fix**: Always use a normalization rule (like Oja's) or weight decay. Check `orthos/plasticity/rules.py` for "Homeostatic" variants.
 
 ### 3. State Leakage in Tests
 **Issue**: Tests passing individually but failing when run in a suite because a layer's internal state (traces) wasn't reset.
 **Fix**: Ensure `reset()` is called between different input sequences.
 
 ### 4. NumPy vs PyTorch Dtypes
-**Issue**: GAIA supports both. Using `np.float64` in a PyTorch-heavy environment can cause unnecessary copying and slowdowns.
-**Fix**: Use `gaia.core.types.FLOAT_TYPE` for all tensor initializations.
+**Issue**: ORTHOS supports both. Using `np.float64` in a PyTorch-heavy environment can cause unnecessary copying and slowdowns.
+**Fix**: Use `orthos.core.types.FLOAT_TYPE` for all tensor initializations.
 
 ## 💡 Pro Tips for Agents
 
-- **Vectorization**: Avoid explicit loops over the batch dimension. GAIA assumes `(batch_size, ...)` for all core operations.
+- **Vectorization**: Avoid explicit loops over the batch dimension. ORTHOS assumes `(batch_size, ...)` for all core operations.
 - **Trace Decay**: A common value for `gamma` (trace decay) is `0.95`. If a layer is "forgetting" too fast, check the `PlasticityController` defaults.
 - **ES Optimization**: Evolutionary Strategies are sensitive to population size. If `ESOptimizer` isn't converging, try increasing `pop_size` in `config/defaults.py` rather than changing the math.
 

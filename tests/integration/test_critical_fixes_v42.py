@@ -1,5 +1,5 @@
 """
-Critical fixes integration tests for GAIA v4.2.
+Critical fixes integration tests for ORTHOS v4.2.
 
 This test suite validates the following critical fixes:
 1. Adaptive noise estimation (Innovation Adaptation with floor value)
@@ -13,10 +13,10 @@ import numpy as np
 import pytest
 from typing import List
 
-from gaia.filters.kalman import KalmanFilter
-from gaia.consensus.engine import HierarchicalConsensus, LevelPrediction
-from gaia.hierarchy.consensus_manager import ConsensusHierarchyManager
-from gaia.hierarchy.level import HierarchicalLevel
+from orthos.filters.kalman import KalmanFilter
+from orthos.consensus.engine import HierarchicalConsensus, LevelPrediction
+from orthos.hierarchy.consensus_manager import ConsensusHierarchyManager
+from orthos.hierarchy.level import HierarchicalLevel
 
 
 class TestAdaptiveNoiseEstimation:

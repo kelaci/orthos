@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="gaia-neuro",
-    version="4.1.0",
-    description="Generalized Adaptive Intelligent Architecture - Biologically plausible neural networks",
-    author="GAIA Team",
-    author_email="dev@gaia.ai",
+    name="orthos-neuro",
+    version="5.0.0",
+    description="ORTHOS: Orthogonal Recursive Hierarchical Optimization System - Probabilistic neural architecture",
+    author="ORTHOS Team",
+    author_email="dev@orthos.ai",
     packages=find_packages(),
     install_requires=[
         "numpy>=1.20.0",

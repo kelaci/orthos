@@ -1,4 +1,4 @@
-# Development requirements for GAIA project
+# Development requirements for ORTHOS project
 # These tools support the coding standard and quality assurance
 
 # Code formatting

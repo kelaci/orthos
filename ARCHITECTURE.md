@@ -2,7 +2,8 @@
 
 ## 🎯 System Vision
 
-GAIA v4.2 is a hierarchical neural architecture designed for:
+ORTHOS v5.0 is a hierarchical neural architecture designed for:
+
 
 - **Temporal abstraction**: Processing information at multiple time scales (1x, 2x, 4x, 8x)
 - **Probabilistic Spine**: Sequential Bayesian estimation using Kalman and Particle filters
@@ -14,8 +15,9 @@ GAIA v4.2 is a hierarchical neural architecture designed for:
 
 ```
 ┌───────────────────────────────────────────────────────────────────────────────┐
-│                                GAIA System (v4.2)                            │
+│                                ORTHOS System (v5.0)                            │
 ├───────────────────────────────────────────────────────────────────────────────┤
+
 │  ┌─────────────────────────────────────────────────────────────────────────┐  │
 │  │                            Consensus Layer                              │  │
 │  │  ┌─────────────────────────────────────────────────────────────────────┐  │  │
@@ -84,11 +86,12 @@ GAIA v4.2 is a hierarchical neural architecture designed for:
 - Dual-timescale traces (Hippocampal/Neocortical)
 - Dynamic adaptation to task requirements
 
-### Probabilistic Spine (v4.2)
+### Probabilistic Spine (v5.0)
 - **Filters**: Kalman (Linear), EKF (Non-linear), Particle (General)
 - **Numerical Stability**: Joseph form covariance updates
 - **Performance**: Diagonal covariance approximation for high-dim states
 - **Consensus**: Multi-level aggregation with outlier rejection and auto-projection
+
 
 ### Extensibility
 - Abstract base classes for all major components
@@ -113,16 +116,17 @@ GAIA v4.2 is a hierarchical neural architecture designed for:
 
 ## 🔮 Future Directions
 
-- **v4.2 ✅**: Probabilistic Spine, Consensus Engine, Numerical Stability
-- **v4.3**: Advanced ES variants (CMA-ES, NES) and Attention mechanisms
-- **v4.4**: Neuroevolution and Direct Topology Optimization
-- **v4.5**: Multi-modal sensory integration (Cross-modal attention)
+- **v5.0 ✅**: Major Rebrand, Probabilistic Spine, Consensus Engine, Numerical Stability
+- **v5.1**: Advanced ES variants (CMA-ES, NES) and Attention mechanisms
+- **v5.2**: Neuroevolution and Direct Topology Optimization
+- **v5.3**: Multi-modal sensory integration (Cross-modal attention)
+
 
 See [Roadmap](ROADMAP.md) for detailed development plans.# Core Components
 
 ## 📦 Core Module Structure
 
-The core module provides the foundation for all GAIA components, including base classes, type definitions, and utility functions.
+The core module provides the foundation for all ORTHOS components, including base classes, type definitions, and utility functions.
 
 ### `core/base.py` - Abstract Base Classes
 
@@ -132,7 +136,7 @@ from typing import Dict, List, Tuple, Any
 import numpy as np
 
 class Module(ABC):
-    """Base class for all GAIA modules."""
+    """Base class for all ORTHOS modules."""
 
     @abstractmethod
     def forward(self, x: np.ndarray) -> np.ndarray:
@@ -307,8 +311,8 @@ def temporal_convolution(x: np.ndarray, kernel: np.ndarray) -> np.ndarray:
 ```python
 import numpy as np
 from typing import Optional, Dict
-from gaia.core.base import Layer
-from gaia.core.types import Tensor, ActivationFunction
+from orthos.core.base import Layer
+from orthos.core.types import Tensor, ActivationFunction
 
 class ReactiveLayer(Layer):
     """
@@ -335,7 +339,7 @@ class ReactiveLayer(Layer):
 
     def _initialize_parameters(self) -> None:
         """Initialize weights and biases."""
-        from gaia.core.tensor import initialize_weights
+        from orthos.core.tensor import initialize_weights
 
         self.weights = initialize_weights((self.output_size, self.input_size), self.init_type)
         self.biases = np.zeros(self.output_size)
@@ -350,7 +354,7 @@ class ReactiveLayer(Layer):
         Returns:
             Output tensor (batch_size, output_size)
         """
-        from gaia.core.tensor import apply_activation
+        from orthos.core.tensor import apply_activation
 
         # Linear transformation
         output = np.dot(x, self.weights.T) + self.biases
@@ -396,7 +400,7 @@ class ReactiveLayer(Layer):
         Returns:
             Activated tensor
         """
-        from gaia.core.tensor import apply_activation
+        from orthos.core.tensor import apply_activation
         return apply_activation(x, self.activation_fn)
 
     def get_weights(self) -> Tensor:
@@ -415,8 +419,8 @@ class ReactiveLayer(Layer):
 ```python
 import numpy as np
 from typing import Dict, Optional
-from gaia.core.base import PlasticComponent
-from gaia.core.types import Tensor, PlasticityParams
+from orthos.core.base import PlasticComponent
+from orthos.core.types import Tensor, PlasticityParams
 
 class HebbianCore(PlasticComponent):
     """
@@ -454,7 +458,7 @@ class HebbianCore(PlasticComponent):
 
     def _initialize_parameters(self) -> None:
         """Initialize weights and activity traces."""
-        from gaia.core.tensor import initialize_weights
+        from orthos.core.tensor import initialize_weights
 
         self.weights = initialize_weights((self.output_size, self.input_size), 'he')
         self.pre_synaptic = np.zeros(self.input_size)
@@ -552,8 +556,8 @@ class HebbianCore(PlasticComponent):
 ```python
 import numpy as np
 from typing import Optional, Dict
-from gaia.core.base import Layer
-from gaia.core.types import Tensor
+from orthos.core.base import Layer
+from orthos.core.types import Tensor
 
 class TemporalLayer(Layer):
     """
@@ -580,7 +584,7 @@ class TemporalLayer(Layer):
 
     def _initialize_parameters(self) -> None:
         """Initialize parameters."""
-        from gaia.core.tensor import initialize_weights
+        from orthos.core.tensor import initialize_weights
 
         # Input to hidden weights
         self.weights = initialize_weights((self.hidden_size, self.input_size), 'he')
@@ -602,7 +606,7 @@ class TemporalLayer(Layer):
         Returns:
             Output tensor (batch_size, hidden_size)
         """
-        from gaia.core.tensor import apply_activation
+        from orthos.core.tensor import apply_activation
 
         # Linear transformation
         linear_output = np.dot(x, self.weights.T) + np.dot(self.hidden_state, self.recurrent_weights.T)
@@ -659,8 +663,8 @@ class TemporalLayer(Layer):
 ```python
 import numpy as np
 from typing import Optional, List, Dict
-from gaia.core.base import HierarchicalLevel
-from gaia.core.types import Tensor
+from orthos.core.base import HierarchicalLevel
+from orthos.core.types import Tensor
 
 class HierarchicalLevel(HierarchicalLevel):
     """
@@ -758,8 +762,8 @@ class HierarchicalLevel(HierarchicalLevel):
 ```python
 from typing import List, Dict, Optional
 import numpy as np
-from gaia.core.types import Tensor
-from gaia.hierarchy.level import HierarchicalLevel
+from orthos.core.types import Tensor
+from orthos.hierarchy.level import HierarchicalLevel
 
 class HierarchyManager:
     """
@@ -854,8 +858,8 @@ class HierarchyManager:
 ```python
 import numpy as np
 from typing import List, Dict, Optional
-from gaia.core.base import PlasticComponent
-from gaia.core.types import Tensor, PlasticityParams
+from orthos.core.base import PlasticComponent
+from orthos.core.types import Tensor, PlasticityParams
 
 class PlasticityController:
     """
@@ -876,7 +880,7 @@ class PlasticityController:
         self.exploration_noise = exploration_noise
 
         # Initialize ES optimizer
-        from gaia.plasticity.es_optimizer import EvolutionaryStrategy
+        from orthos.plasticity.es_optimizer import EvolutionaryStrategy
         self.es_optimizer = EvolutionaryStrategy()
 
         # Initialize plasticity parameters
@@ -1155,7 +1159,7 @@ class BCMRule(PlasticityRule):
 ```python
 import numpy as np
 from typing import List, Dict, Callable
-from gaia.core.types import Tensor
+from orthos.core.types import Tensor
 
 class MetaOptimizer:
     """
@@ -1250,7 +1254,7 @@ class MetaOptimizer:
 ```python
 import numpy as np
 from typing import Dict, List
-from gaia.core.base import Module
+from orthos.core.base import Module
 
 def measure_plasticity_efficiency(module: Module) -> float:
     """
@@ -1373,10 +1377,10 @@ import logging
 from typing import Optional, Dict
 import numpy as np
 
-def setup_logging(name: str = 'gaia', level: str = 'INFO',
+def setup_logging(name: str = 'orthos', level: str = 'INFO',
                  log_file: Optional[str] = None) -> logging.Logger:
     """
-    Set up logging for GAIA.
+    Set up logging for ORTHOS.
 
     Args:
         name: Logger name
@@ -1536,16 +1540,16 @@ def plot_plasticity_parameters(params_history: List[Dict[str, float]],
 
 ```python
 import numpy as np
-from gaia.core.base import Module
-from gaia.layers.reactive import ReactiveLayer
-from gaia.layers.hebbian import HebbianCore
-from gaia.layers.temporal import TemporalLayer
-from gaia.hierarchy.level import HierarchicalLevel
-from gaia.hierarchy.manager import HierarchyManager
+from orthos.core.base import Module
+from orthos.layers.reactive import ReactiveLayer
+from orthos.layers.hebbian import HebbianCore
+from orthos.layers.temporal import TemporalLayer
+from orthos.hierarchy.level import HierarchicalLevel
+from orthos.hierarchy.manager import HierarchyManager
 
 def basic_demo():
-    """Basic demonstration of GAIA components."""
-    print("GAIA Basic Demo")
+    """Basic demonstration of ORTHOS components."""
+    print("ORTHOS Basic Demo")
     print("=" * 50)
 
     # Create a simple hierarchy
@@ -1590,7 +1594,7 @@ if __name__ == "__main__":
 ### `__init__.py` Files
 
 ```python
-# gaia/__init__.py
+# orthos/__init__.py
 from .core import *
 from .layers import *
 from .hierarchy import *
@@ -1599,34 +1603,34 @@ from .meta_learning import *
 from .utils import *
 from .config import *
 
-# gaia/core/__init__.py
+# orthos/core/__init__.py
 from .base import Module, Layer, PlasticComponent, HierarchicalLevel
 from .types import *
 from .tensor import *
 
-# gaia/layers/__init__.py
+# orthos/layers/__init__.py
 from .reactive import ReactiveLayer
 from .hebbian import HebbianCore
 from .temporal import TemporalLayer
 
-# gaia/hierarchy/__init__.py
+# orthos/hierarchy/__init__.py
 from .level import HierarchicalLevel
 from .manager import HierarchyManager
 
-# gaia/plasticity/__init__.py
+# orthos/plasticity/__init__.py
 from .controller import PlasticityController
 from .es_optimizer import EvolutionaryStrategy
 from .rules import *
 
-# gaia/meta_learning/__init__.py
+# orthos/meta_learning/__init__.py
 from .optimizer import MetaOptimizer
 from .metrics import *
 
-# gaia/utils/__init__.py
+# orthos/utils/__init__.py
 from .logging import *
 from .visualization import *
 
-# gaia/config/__init__.py
+# orthos/config/__init__.py
 from .defaults import *
 ```
 
@@ -1660,13 +1664,13 @@ The v4.2 architecture is now the stable production baseline. Future development 
 2. **Structural Plasticity**: Sparse attention and dynamic topology
 3. **Multi-Modal Hubs**: Cross-level integration of visual/auditory/tactile streams
 
-This architecture provides a solid foundation for GAIA's journey toward artificial general intelligence!
+This architecture provides a solid foundation for ORTHOS's journey toward artificial general intelligence!
 
 # Plasticity System
 
 ## 🎯 Plasticity Overview
 
-The plasticity system is the heart of GAIA's learning capability, enabling adaptive behavior through meta-learning of plasticity parameters using Evolutionary Strategies.
+The plasticity system is the heart of ORTHOS's learning capability, enabling adaptive behavior through meta-learning of plasticity parameters using Evolutionary Strategies.
 
 ## 🏗️ Plasticity Architecture
 
@@ -1956,11 +1960,11 @@ plot_plasticity_parameters(params_history)
 plot_learning_curve(performance_history)
 ```
 
-This plasticity system provides GAIA with powerful meta-learning capabilities for adaptive behavior!# Hierarchy System
+This plasticity system provides ORTHOS with powerful meta-learning capabilities for adaptive behavior!# Hierarchy System
 
 ## 🎯 Hierarchical Processing Overview
 
-The hierarchy system is the core of GAIA's temporal abstraction capability, enabling processing at multiple time scales and levels of abstraction.
+The hierarchy system is the core of ORTHOS's temporal abstraction capability, enabling processing at multiple time scales and levels of abstraction.
 
 ## 🏗️ Hierarchy Architecture
 
@@ -2171,11 +2175,11 @@ level0_reps = representations[0]  # 100 representations
 level1_reps = representations[1]  # 50 representations (every 2nd step)
 ```
 
-This hierarchy system provides the foundation for GAIA's temporal abstraction and multi-scale processing capabilities!# Advanced Plasticity System
+This hierarchy system provides the foundation for ORTHOS's temporal abstraction and multi-scale processing capabilities!# Advanced Plasticity System
 
 ## 🧬 Overview
 
-GAIA's advanced plasticity system implements **dual-timescale Hebbian learning** with **BitNet quantization** and **diagnostic tracking**. This document details the PyTorch implementation (v3.1) which extends the conceptual framework of the NumPy-based v4.x architecture.
+ORTHOS's advanced plasticity system implements **dual-timescale Hebbian learning** with **BitNet quantization** and **diagnostic tracking**. This document details the PyTorch implementation (v3.1) which extends the conceptual framework of the NumPy-based v4.x architecture.
 
 ---
 
